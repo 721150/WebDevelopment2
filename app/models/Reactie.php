@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Reactie {
+use JsonSerializable;
+
+class Reactie implements JsonSerializable {
     private int $id;
     private string $dateTime;
     private string $content;
@@ -30,6 +32,11 @@ class Reactie {
 
     public function setContent(string $content) {
         $this->content = $content;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

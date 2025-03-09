@@ -1,6 +1,8 @@
 {
     "name": "root/app",
-    "require": {},
+    "require": {
+        "bramus/router": "~1.6"
+    },
 
     "autoload": {
         "psr-4": {

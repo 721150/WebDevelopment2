@@ -9,10 +9,10 @@ enum TypeOfLow: string {
 
     public static function fromDatabase(string $type): ?self {
         return match($type) {
-            'Petition' => self::Petition,
-            'Appeal' => self::Appeal,
-            'Objection' => self::Objection,
-            'Complaint' => self::Complaint,
+            self::Petition->value => self::Petition,
+            self::Appeal->value => self::Appeal,
+            self::Complaint->value => self::Objection,
+            self::Objection->value => self::Complaint,
             default => null,
         };
     }

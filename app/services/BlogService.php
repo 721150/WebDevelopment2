@@ -13,5 +13,9 @@ class BlogService {
     public function getAll() {
         return $this->blogRepository->getAll();
     }
+
+    public function getOne(int $id) {
+        return $this->blogRepository->getOne($id);
+    }
 }
 ?>

@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Document {
+use JsonSerializable;
+
+class Document implements JsonSerializable {
     private int $id;
     private string $document;
 
@@ -20,6 +22,11 @@ class Document {
 
     public function setDocument(string $document) {
         $this->document = $document;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 

@@ -2,10 +2,11 @@
 namespace App\Models;
 
 use App\Models\Enums\Status;
+use JsonSerializable;
 
-class CaseModel {
+class CaseModel implements JsonSerializable {
     private int $id;
-    private User $user;
+    private Applicant $user;
     private Subject $subject;
     private TypeOfLaw $typeOfLaw;
     private string $content;
@@ -14,7 +15,7 @@ class CaseModel {
     private Education $education;
     private array $documents;
 
-    public function __construct(int $id, User $user, Subject $subject, TypeOfLaw $typeOfLaw, string $content, Status $status, Institution $institution, Education $education, array $documents = []) {
+    public function __construct(int $id, Applicant $user, Subject $subject, TypeOfLaw $typeOfLaw, string $content, Status $status, Institution $institution, Education $education, array $documents = []) {
         $this->id = $id;
         $this->user = $user;
         $this->subject = $subject;
@@ -34,7 +35,7 @@ class CaseModel {
         return $this->user;
     }
 
-    public function setUser(User $user) {
+    public function setUser(Applicant $user) {
         $this->user = $user;
     }
 
@@ -92,6 +93,11 @@ class CaseModel {
 
     public function addDocument(Document $document) {
         $this->documents[] = $document;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

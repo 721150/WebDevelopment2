@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/app/./models" isTestSource="false" packagePrefix="App\Models\" />
       <sourceFolder url="file://$MODULE_DIR$/app/./repositories" isTestSource="false" packagePrefix="App\Repositories\" />
       <sourceFolder url="file://$MODULE_DIR$/app/./services" isTestSource="false" packagePrefix="App\Services\" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/bramus/router" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/composer" />
     </content>
     <orderEntry type="inheritedJdk" />

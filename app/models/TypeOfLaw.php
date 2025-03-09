@@ -2,8 +2,9 @@
 namespace App\Models;
 
 use App\Models\Enums\TypeOfLow;
+use JsonSerializable;
 
-class TypeOfLaw {
+class TypeOfLaw implements JsonSerializable {
     private int $id;
     private TypeOfLow $description;
 
@@ -22,6 +23,11 @@ class TypeOfLaw {
 
     public function setDescription(TypeOfLow $description) {
         $this->description = $description;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

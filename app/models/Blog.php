@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Blog {
+use JsonSerializable;
+
+class Blog implements JsonSerializable {
     private int $id;
     private string $dateTime;
     private Institution $institution;
@@ -90,6 +92,11 @@ class Blog {
 
     public function addReactie(Reactie $reactie) {
         $this->reacties[] = $reactie;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Subject {
+use JsonSerializable;
+
+class Subject implements JsonSerializable {
     private int $id;
     private string $description;
 
@@ -20,6 +22,11 @@ class Subject {
 
     public function setDescription(string $description) {
         $this->description = $description;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

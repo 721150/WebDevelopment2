@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Applicant extends User {
+use JsonSerializable;
+
+class Applicant extends User implements JsonSerializable {
     private int $userId;
     private Education $education;
 
@@ -21,6 +23,11 @@ class Applicant extends User {
 
     public function setEducation(Education $education) {
         $this->education = $education;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>

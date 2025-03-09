@@ -2,13 +2,13 @@
 namespace App\Models;
 
 class User {
-    private int $id;
-    private string $firstname;
-    private string $lastname;
-    private string $email;
-    private Institution $institution;
-    private string $image;
-    private string $phone;
+    protected int $id;
+    protected string $firstname;
+    protected string $lastname;
+    protected string $email;
+    protected Institution $institution;
+    protected ?string $image;
+    protected string $phone;
 
     public function __construct(int $id, string $firstname, string $lastname, string $email, Institution $institution, string $image, string $phone) {
         $this->id = $id;

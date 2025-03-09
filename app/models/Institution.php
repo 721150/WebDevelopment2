@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Institution {
+use JsonSerializable;
+
+class Institution implements JsonSerializable {
     private int $id;
     private string $name;
 
@@ -20,6 +22,11 @@ class Institution {
 
     public function setName(string $name) {
         $this->name = $name;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        return $vars;
     }
 }
 ?>
