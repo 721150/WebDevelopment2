@@ -8,8 +8,7 @@
             "App\\Controllers\\": "./controllers",
             "App\\Models\\": "./models",
             "App\\Services\\": "./services",
-            "App\\Repositories\\": "./repositories",
-            "App\\Views\\": "./views"
+            "App\\Repositories\\": "./repositories"
         }
     }
 }

@@ -1,0 +1,25 @@
+<?php
+namespace App\Models;
+
+class Subject {
+    private int $id;
+    private string $description;
+
+    public function __construct(int $id, string $description) {
+        $this->id = $id;
+        $this->description = $description;
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+
+    public function setDescription(string $description) {
+        $this->description = $description;
+    }
+}
+?>
