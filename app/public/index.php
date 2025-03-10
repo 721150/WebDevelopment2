@@ -27,5 +27,12 @@ $router->get('/cases/(\d+)', 'CaseController@getOne');
 $router->post('/cases', 'CaseController@create');
 $router->put('/cases/(\d+)', 'CaseController@update');
 
+// Routes voor de gebruikers verbindingen
+$router->get('/users', 'UserController@getAll');
+$router->get('/users/(\d+)', 'UserController@getOne');
+$router->post('/users', 'UserController@create');
+$router->put('/users/(\d+)', 'UserController@update');
+$router->delete('/users/(\d+)', 'UserController@delete');
+
 $router->run();
 ?>
