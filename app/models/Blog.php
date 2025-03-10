@@ -4,7 +4,7 @@ namespace App\Models;
 use JsonSerializable;
 
 class Blog implements JsonSerializable {
-    private int $id;
+    private ?int $id;
     private string $dateTime;
     private Institution $institution;
     private Education $education;
@@ -14,7 +14,7 @@ class Blog implements JsonSerializable {
     private string $content;
     private array $reacties;
 
-    public function __construct(int $id, string $dateTime, Institution $institution, Education $education, Subject $subject, TypeOfLaw $typeOfLaw, string $description, string $content, array $reacties = []) {
+    public function __construct(?int $id, string $dateTime, Institution $institution, Education $education, Subject $subject, TypeOfLaw $typeOfLaw, string $description, string $content, array $reacties = []) {
         $this->id = $id;
         $this->dateTime = $dateTime;
         $this->institution = $institution;

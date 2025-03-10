@@ -17,6 +17,9 @@ $router->setNamespace('App\Controllers');
 // Routes voor de blog verbindingen
 $router->get('/blogs', 'BlogController@getAll');
 $router->get('/blogs/(\d+)', 'BlogController@getOne');
+$router->post('/blogs', 'BlogController@create');
+$router->put('/blogs/(\d+)', 'BlogController@update');
+$router->delete('/blogs/(\d+)', 'BlogController@delete');
 
 // Routes voor de casus verbindingen
 $router->get('/cases', 'CaseController@getAll');

@@ -17,18 +17,9 @@ class Controller {
         echo json_encode($data, JSON_UNESCAPED_SLASHES);
     }
 
-    function createObjectFromPostedJson($className) {
+    function getRequestData() {
         $json = file_get_contents('php://input');
-        $data = json_decode($json);
-
-        $object = new $className();
-        foreach ($data as $key => $value) {
-            if(is_object($value)) {
-                continue;
-            }
-            $object->{$key} = $value;
-        }
-        return $object;
+        return json_decode($json, true);
     }
 }
 ?>

@@ -4,11 +4,11 @@ namespace App\Models;
 use JsonSerializable;
 
 class Reactie implements JsonSerializable {
-    private int $id;
+    private ?int $id;
     private string $dateTime;
     private string $content;
 
-    public function __construct(int $id, string $dateTime, string $content) {
+    public function __construct(?int $id, string $dateTime, string $content) {
         $this->id = $id;
         $this->dateTime = $dateTime;
         $this->content = $content;
