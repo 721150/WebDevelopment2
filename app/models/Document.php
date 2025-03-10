@@ -4,10 +4,10 @@ namespace App\Models;
 use JsonSerializable;
 
 class Document implements JsonSerializable {
-    private int $id;
+    private ?int $id;
     private string $document;
 
-    public function __construct(int $id, string $document) {
+    public function __construct(?int $id, string $document) {
         $this->id = $id;
         $this->document = $document;
     }

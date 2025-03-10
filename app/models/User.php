@@ -2,7 +2,7 @@
 namespace App\Models;
 
 class User {
-    protected int $id;
+    protected ?int $id;
     protected string $firstname;
     protected string $lastname;
     protected string $email;
@@ -10,7 +10,7 @@ class User {
     protected ?string $image;
     protected string $phone;
 
-    public function __construct(int $id, string $firstname, string $lastname, string $email, Institution $institution, string $image, string $phone) {
+    public function __construct(?int $id, string $firstname, string $lastname, string $email, Institution $institution, ?string $image, string $phone) {
         $this->id = $id;
         $this->firstname = $firstname;
         $this->lastname = $lastname;

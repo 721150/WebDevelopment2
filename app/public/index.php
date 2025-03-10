@@ -24,6 +24,8 @@ $router->delete('/blogs/(\d+)', 'BlogController@delete');
 // Routes voor de casus verbindingen
 $router->get('/cases', 'CaseController@getAll');
 $router->get('/cases/(\d+)', 'CaseController@getOne');
+$router->post('/cases', 'CaseController@create');
+$router->put('/cases/(\d+)', 'CaseController@update');
 
 $router->run();
 ?>

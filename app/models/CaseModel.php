@@ -5,7 +5,7 @@ use App\Models\Enums\Status;
 use JsonSerializable;
 
 class CaseModel implements JsonSerializable {
-    private int $id;
+    private ?int $id;
     private Applicant $user;
     private Subject $subject;
     private TypeOfLaw $typeOfLaw;
@@ -15,7 +15,7 @@ class CaseModel implements JsonSerializable {
     private Education $education;
     private array $documents;
 
-    public function __construct(int $id, Applicant $user, Subject $subject, TypeOfLaw $typeOfLaw, string $content, Status $status, Institution $institution, Education $education, array $documents = []) {
+    public function __construct(?int $id, Applicant $user, Subject $subject, TypeOfLaw $typeOfLaw, string $content, Status $status, Institution $institution, Education $education, array $documents = []) {
         $this->id = $id;
         $this->user = $user;
         $this->subject = $subject;

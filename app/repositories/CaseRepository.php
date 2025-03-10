@@ -76,6 +76,8 @@ class CaseRepository extends Repository {
                 $documents[] = $document;
             }
 
+            $image = $row['image'] ? base64_encode($row['image']) : null;
+
             $case = new CaseModel(
                 $row['id'],
                 new Applicant(
@@ -84,7 +86,7 @@ class CaseRepository extends Repository {
                     $row['lastname'],
                     $row['email'],
                     new Institution($row['institutionId'], $row['institution']),
-                    base64_encode($row['image']),
+                    $image,
                     $row['phone'],
                     $row['applicantId'],
                     new Education($row['educationId'], $row['education'])
@@ -100,5 +102,134 @@ class CaseRepository extends Repository {
         }
 
         return $case;
+    }
+
+    public function create(CaseModel $case) {
+        $newCase = null;
+
+        $this->connection->beginTransaction();
+
+        try {
+
+            $stmt = $this->connection->prepare("INSERT INTO `case` (userId, subjectId, typeOfLawId, content, statusId, institutionId, educationId) VALUES (:userId, :subjectId, :typeOfLawId, :content, :statusId, :institutionId, :educationId)");
+
+            $userId = $case->getUser()->getUserId();
+            $subjectId = $case->getSubject()->getId();
+            $typeOfLawId = $case->getTypeOfLaw()->getId();
+            $content = $case->getContent();
+            $statusId = $this->getStatusIdByDescription($case->getStatus()->value);
+            $institutionId = $case->getInstitution()->getId();
+            $educationId = $case->getEducation()->getId();
+
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':subjectId', $subjectId);
+            $stmt->bindParam(':typeOfLawId', $typeOfLawId);
+            $stmt->bindParam(':content', $content);
+            $stmt->bindParam(':statusId', $statusId);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':educationId', $educationId);
+
+            $stmt->execute();
+
+            $caseId = $this->connection->lastInsertId();
+
+            $documents = [];
+            foreach ($case->getDocuments() as $document) {
+                $stmt = $this->connection->prepare("INSERT INTO document (caseId, document) VALUES (:caseId, :document)");
+                $docContent = $document->getDocument();
+
+                $stmt->bindParam(':caseId', $caseId);
+                $stmt->bindParam(':document', $docContent);
+
+                $stmt->execute();
+
+                $documentId = $this->connection->lastInsertId();
+                $documents[] = new Document($documentId, $docContent);
+            }
+
+            $this->connection->commit();
+
+            $newCase = new CaseModel($caseId, $case->getUser(), $case->getSubject(), $case->getTypeOfLaw(), $case->getContent(), $case->getStatus(), $case->getInstitution(), $case->getEducation(), $documents);
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+        }
+        return $newCase;
+    }
+
+    private function getStatusIdByDescription(string $description): ?int
+    {
+        $stmt = $this->connection->prepare("SELECT id FROM status WHERE description = :description");
+        $stmt->bindParam(':description', $description);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int)$row['id'] : null;
+    }
+
+    public function update(CaseModel $case) {
+        $this->connection->beginTransaction();
+
+        try {
+            $stmt = $this->connection->prepare("UPDATE `case` SET userId = :userId, subjectId = :subjectId, typeOfLawId = :typeOfLawId, content = :content, statusId = :statusId, institutionId = :institutionId, educationId = :educationId WHERE id = :id");
+
+            $userId = $case->getUser()->getUserId();
+            $subjectId = $case->getSubject()->getId();
+            $typeOfLawId = $case->getTypeOfLaw()->getId();
+            $content = $case->getContent();
+            $statusId = $this->getStatusIdByDescription($case->getStatus()->value);
+            $institutionId = $case->getInstitution()->getId();
+            $educationId = $case->getEducation()->getId();
+            $id = $case->getId();
+
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':subjectId', $subjectId);
+            $stmt->bindParam(':typeOfLawId', $typeOfLawId);
+            $stmt->bindParam(':content', $content);
+            $stmt->bindParam(':statusId', $statusId);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':educationId', $educationId);
+            $stmt->bindParam(':id', $id);
+
+            $stmt->execute();
+
+            $existingDocStmt = $this->connection->prepare("SELECT id FROM document WHERE caseId = :caseId");
+            $existingDocStmt->execute(['caseId' => $id]);
+            $existingDocIds = $existingDocStmt->fetchAll(PDO::FETCH_COLUMN, 0);
+
+            $newDocIds = [];
+            foreach ($case->getDocuments() as $document) {
+                if ($document->getId() === null) {
+                    $stmt = $this->connection->prepare("INSERT INTO document (caseId, document) VALUES (:caseId, :document)");
+                    $docContent = $document->getDocument();
+                    $stmt->bindParam(':caseId', $id);
+                    $stmt->bindParam(':document', $docContent);
+                    $stmt->execute();
+                    $newDocIds[] = $this->connection->lastInsertId();
+                } else {
+                    $stmt = $this->connection->prepare("UPDATE document SET document = :document WHERE id = :id");
+                    $docContent = $document->getDocument();
+                    $docId = $document->getId();
+                    $stmt->bindParam(':document', $docContent);
+                    $stmt->bindParam(':id', $docId);
+                    $stmt->execute();
+                    $newDocIds[] = $docId;
+                }
+            }
+
+            $docsToDelete = array_diff($existingDocIds, $newDocIds);
+            if (!empty($docsToDelete)) {
+                $deleteStmt = $this->connection->prepare("DELETE FROM document WHERE id = :id");
+                foreach ($docsToDelete as $docId) {
+                    $deleteStmt->execute(['id' => $docId]);
+                }
+            }
+
+            $this->connection->commit();
+
+            return $this->getOne($id);
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+            return null;
+        }
     }
 }

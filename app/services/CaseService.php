@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\CaseModel;
 use App\Repositories\CaseRepository;
 
 class CaseService {
@@ -16,5 +17,13 @@ class CaseService {
 
     public function getOne(int $id) {
         return $this->caseRepository->getOne($id);
+    }
+
+    public function create(CaseModel $case) {
+        return $this->caseRepository->create($case);
+    }
+
+    public function update(CaseModel $case) {
+        return $this->caseRepository->update($case);
     }
 }
