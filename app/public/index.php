@@ -34,5 +34,20 @@ $router->post('/users', 'UserController@create');
 $router->put('/users/(\d+)', 'UserController@update');
 $router->delete('/users/(\d+)', 'UserController@delete');
 
+// Routes voor de opleidingen
+$router->get('/educations', 'EducationController@getAll');
+
+// Routes voor de scholen
+$router->get('/institutions', 'InstitutionController@getAll');
+
+// Routes voor de onderwerpen
+$router->get('/subjects', 'SubjectController@getAll');
+
+// Routes voor de type rechten
+$router->get('/typesOfLows', 'TypeOfLowController@getAll');
+
+// Routes voor de reacties
+$router->post('/reacties', 'ReactieController@create');
+
 $router->run();
 ?>

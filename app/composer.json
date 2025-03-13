@@ -1,7 +1,8 @@
 {
     "name": "root/app",
     "require": {
-        "bramus/router": "~1.6"
+        "bramus/router": "~1.6",
+      "ext-pdo": "*"
     },
 
     "autoload": {

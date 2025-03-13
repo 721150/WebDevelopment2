@@ -3,8 +3,8 @@ namespace App\Models\Enums;
 
 enum Status: string {
     case Open = "Open";
-    case Closed = "Closed";
-    case InProgress = "In Progress";
+    case Closed = "Gesloten";
+    case InProgress = "In behandeling";
 
     public static function fromDatabase(string $status): ?self {
         return match ($status) {

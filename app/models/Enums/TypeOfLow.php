@@ -2,10 +2,10 @@
 namespace App\Models\Enums;
 
 enum TypeOfLow: string {
-    case Petition = "Petition";
-    case Appeal = "Appeal";
-    case Objection = "Objection";
-    case Complaint = "Complaint";
+    case Petition = "Verzoekschrift";
+    case Appeal = "Beroep";
+    case Objection = "Bezwaar";
+    case Complaint = "Klacht";
 
     public static function fromDatabase(string $type): ?self {
         return match($type) {
