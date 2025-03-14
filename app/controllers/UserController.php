@@ -10,6 +10,22 @@ class UserController extends Controller {
         $this->userService = new UserService();
     }
 
+    public function login() {
+        $logindata = $this->getRequestData();
+
+        // TODO dit verder afmaken
+        $user = $this->userService->login($logindata['username'], $logindata['password']);
+
+        if (!$user) {
+            $this->respondWithError(401,"Username or password is incorrect");
+        }
+
+        // TODO nog aanmaken in apparte service
+        $jwt = $this->userService->generateJwt($user);
+
+        $this->respond($jwt);
+    }
+
     public function getAll() {
         $users = $this->userService->getAll();
 
