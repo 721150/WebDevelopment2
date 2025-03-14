@@ -19,8 +19,8 @@ class UserService {
         return $this->userRepository->getOne($id);
     }
 
-    public function create(User $user) {
-        return $this->userRepository->create($user);
+    public function createAdmin(User $user) {
+        return $this->userRepository->createAdmin($user);
     }
 
     public function update(User $user) {
@@ -29,6 +29,10 @@ class UserService {
 
     public function delete($id) {
         return $this->userRepository->delete($id);
+    }
+
+    public function login(string $username, string $password) {
+        return $this->userRepository->login($username, $password);
     }
 }
 ?>

@@ -6,15 +6,17 @@ class User {
     protected string $firstname;
     protected string $lastname;
     protected string $email;
+    protected ?string $password;
     protected Institution $institution;
     protected ?string $image;
     protected string $phone;
 
-    public function __construct(?int $id, string $firstname, string $lastname, string $email, Institution $institution, ?string $image, string $phone) {
+    public function __construct(?int $id, string $firstname, string $lastname, string $email, ?string $password, Institution $institution, ?string $image, string $phone) {
         $this->id = $id;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->email = $email;
+        $this->password = $password;
         $this->institution = $institution;
         $this->image = $image;
         $this->phone = $phone;
@@ -48,6 +50,14 @@ class User {
         $this->email = $email;
     }
 
+    public function getPassword() {
+        return $this->password;
+    }
+
+    public function setPassword(string $password) {
+        $this->password = $password;
+    }
+
     public function getInstitution() {
         return $this->institution;
     }
@@ -57,11 +67,21 @@ class User {
     }
 
     public function getImage() {
+        if ($this->image !== null) {
+            return 'data:image/jpeg;base64,' . base64_encode($this->image);
+        }
+        return null;
+    }
+
+    public function getImageString() {
         return $this->image;
     }
 
     public function setImage(string $image) {
-        $this->image = $image;
+        if (is_array($image) && isset($image['tmp_name']) && !empty($image['tmp_name'])) {
+            $imageData = file_get_contents($image['tmp_name']);
+            $this->image = $imageData;
+        }
     }
 
     public function getPhone() {

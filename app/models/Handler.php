@@ -6,7 +6,7 @@ class Handler extends User {
     private array $typeOfLaws = [];
     private array $subjects = [];
 
-    public function __construct(int $id, string $firstname, string $lastname, string $email, Institution $institution, string $image, string $phone, int $userId, array $typeOfLaws = [], array $subjects = []) {
+    public function __construct(int $id, string $firstname, string $lastname, string $email, Institution $institution, ?string $image, string $phone, int $userId, array $typeOfLaws = [], array $subjects = []) {
         parent::__construct($id, $firstname, $lastname, $email, $institution, $image, $phone);
         $this->userId = $userId;
         $this->typeOfLaws = $typeOfLaws;

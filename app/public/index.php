@@ -30,9 +30,10 @@ $router->put('/cases/(\d+)', 'CaseController@update');
 // Routes voor de gebruikers verbindingen
 $router->get('/users', 'UserController@getAll');
 $router->get('/users/(\d+)', 'UserController@getOne');
-$router->post('/users', 'UserController@create');
+$router->post('/users/admin', 'UserController@createAdmin');
 $router->put('/users/(\d+)', 'UserController@update');
 $router->delete('/users/(\d+)', 'UserController@delete');
+$router->get('/users/login', 'UserController@login');
 
 // Routes voor de opleidingen
 $router->get('/educations', 'EducationController@getAll');

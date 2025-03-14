@@ -1,27 +1,31 @@
 <?php
 namespace App\Controllers;
 
+use App\Models\Institution;
+use App\Models\User;
+use App\Services\JwtService;
 use App\Services\UserService;
 
 class UserController extends Controller {
     private $userService;
+    private $jwtService;
 
     function __construct() {
         $this->userService = new UserService();
+        $this->jwtService = new JwtService();
     }
 
     public function login() {
         $logindata = $this->getRequestData();
 
-        // TODO dit verder afmaken
         $user = $this->userService->login($logindata['username'], $logindata['password']);
 
         if (!$user) {
             $this->respondWithError(401,"Username or password is incorrect");
+            return;
         }
 
-        // TODO nog aanmaken in apparte service
-        $jwt = $this->userService->generateJwt($user);
+        $jwt = $this->jwtService->generateJwt($user);
 
         $this->respond($jwt);
     }
@@ -48,34 +52,31 @@ class UserController extends Controller {
         $this->respond($user);
     }
 
-    public function create() {
+    public function createAdmin() {
         $data = $this->getRequestData();
 
-        if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['institution']) || empty($data['phone'])) {
+        if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone'])) {
             $this->respondWithError(400, "Missing required fields");
             return;
         }
 
         $institution = new Institution($data['institution']['id'], $data['institution']['name']);
-        $image = $data['image'] ?? null; // Maak de afbeelding optioneel
-        $user = new User(
-            null, // Zal door database worden gemaakt
-            $data['firstname'],
-            $data['lastname'],
-            $data['email'],
-            $institution,
-            $image,
-            $data['phone']
-        );
+        $image = $data['image'] ?? null;
+        $user = new User(null, $data['firstname'], $data['lastname'], $data['email'], $data['password'], $institution, null, $data['phone']);
 
-        $createdUser = $this->userService->create($user);
+        if ($image !== null) { // TODO afbeelding wordt niet goed toegevoegd
+            $user->setImage($image);
+            echo $user->getImage();
+        }
+
+        $createdUser = $this->userService->createAdmin($user);
 
         if (!$createdUser) {
             $this->respondWithError(500, "Failed to create user");
             return;
         }
 
-        $this->respond($createdUser);
+          $this->respond($createdUser);
     }
 
     public function update($id) {
