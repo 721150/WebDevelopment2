@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 13 mrt 2025 om 14:34
+-- Gegenereerd op: 14 mrt 2025 om 10:18
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.27
 
@@ -67,7 +67,8 @@ INSERT INTO `blog` (`id`, `dateTime`, `institutionId`, `educationId`, `subjectId
 (1, '2025-03-09 14:07:02', 16, 19, 5, 3, 'Collegegeld', 'Hoe kan ik een deel van mijn collegegeld terugkrijgen als ik eerder stop met mijn opleiding?'),
 (2, '2025-03-09 18:21:38', 18, 6, 9, 1, 'Studentenwoningen', 'De hogeschool regelt geen onderdak. Hoe kan ik dit aanpakken?'),
 (3, '2025-03-10 14:07:02', 5, 5, 1, 1, 'Toelating', 'Wat kan ok doen als ik het niet eens ben met een afwijzing voor de opleiding, omdat ik geen wiskunde heb gevolgd?'),
-(4, '2025-03-10 08:44:45', 5, 5, 1, 1, 'Uitschrijving', 'De opleiding heeft me zomaar uitgeschreven. Wat kan ik doen?');
+(4, '2025-03-10 08:44:45', 5, 5, 1, 1, 'Uitschrijving', 'De opleiding heeft me zomaar uitgeschreven. Wat kan ik doen?'),
+(6, '2025-03-14 08:29:24', 5, 5, 1, 1, 'Toelating', 'Ik met het niet eens met de toelatingsvoorwaarden. Wat kan ik doen?');
 
 -- --------------------------------------------------------
 
@@ -275,7 +276,10 @@ CREATE TABLE `reactie` (
 INSERT INTO `reactie` (`id`, `blogId`, `dateTime`, `content`) VALUES
 (1, 1, '2025-03-09 14:08:20', 'Dat wordt automatisch voor je gedaan.'),
 (2, 1, '2025-03-09 14:08:20', 'Vraag het na bij de csa.'),
-(6, 1, '2025-03-10 10:04:22', 'Vraag het na bij je teamleider na.');
+(6, 1, '2025-03-10 10:04:22', 'Vraag het na bij je teamleider na.'),
+(19, 1, '2025-03-14 08:09:17', 'test'),
+(20, 1, '2025-03-14 08:10:18', 'test'),
+(21, 1, '2025-03-14 08:10:27', 'test');
 
 -- --------------------------------------------------------
 
@@ -496,7 +500,7 @@ ALTER TABLE `applicant`
 -- AUTO_INCREMENT voor een tabel `blog`
 --
 ALTER TABLE `blog`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT voor een tabel `case`
@@ -544,7 +548,7 @@ ALTER TABLE `institution`
 -- AUTO_INCREMENT voor een tabel `reactie`
 --
 ALTER TABLE `reactie`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT voor een tabel `status`
