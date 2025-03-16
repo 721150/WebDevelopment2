@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class User {
+use JsonSerializable;
+
+class User implements JsonSerializable {
     protected ?int $id;
     protected string $firstname;
     protected string $lastname;
@@ -80,6 +82,14 @@ class User {
 
     public function setPhone(string $phone) {
         $this->phone = $phone;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = get_object_vars($this);
+        if ($this->image) {
+            $vars['image'] = 'data:image/jpeg;base64,' . base64_encode($this->image);
+        }
+        return $vars;
     }
 }
 ?>

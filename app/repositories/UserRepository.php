@@ -20,9 +20,17 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
     }
 
     public function getOne(int $id) {
-        $stmt = $this->connection->prepare("SELECT * FROM `user` WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetchObject(User::class);
+        $stmt = $this->connection->prepare("SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.institutionId, u.image, u.phone, i.id as institution_id, i.name as institution_name FROM `user` u JOIN `institution` i ON u.institutionId = i.id WHERE u.id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $institution = new Institution($row['institution_id'], $row['institution_name']);
+        $image = $row['image'] ?? null;
+
+        $user = new User($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone']);
+
+        return $user;
     }
 
     public function createAdmin(User $user) {

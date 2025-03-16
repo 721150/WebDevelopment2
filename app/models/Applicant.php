@@ -7,7 +7,7 @@ class Applicant extends User implements JsonSerializable {
     private ?int $userId;
     private Education $education;
 
-    public function __construct(?int $id, string $firstname, string $lastname, string $email, string $password, Institution $institution, ?string $image, string $phone, ?int $userId, Education $education) {
+    public function __construct(?int $id, string $firstname, string $lastname, string $email, ?string $password, Institution $institution, ?string $image, string $phone, ?int $userId, Education $education) {
         parent::__construct($id, $firstname, $lastname, $email, $password, $institution, $image, $phone);
         $this->userId = $userId;
         $this->education = $education;
