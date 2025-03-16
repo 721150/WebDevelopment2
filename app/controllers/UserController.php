@@ -1,7 +1,13 @@
 <?php
 namespace App\Controllers;
 
+use App\Models\Applicant;
+use App\Models\Education;
+use App\Models\Enums\TypeOfLow;
+use App\Models\Handler;
 use App\Models\Institution;
+use App\Models\Subject;
+use App\Models\TypeOfLaw;
 use App\Models\User;
 use App\Services\JwtService;
 use App\Services\UserService;
@@ -64,9 +70,8 @@ class UserController extends Controller {
         $image = $data['image'] ?? null;
         $user = new User(null, $data['firstname'], $data['lastname'], $data['email'], $data['password'], $institution, null, $data['phone']);
 
-        if ($image !== null) { // TODO afbeelding wordt niet goed toegevoegd
+        if ($image !== null) {
             $user->setImage($image);
-            echo $user->getImage();
         }
 
         $createdUser = $this->userService->createAdmin($user);
@@ -77,6 +82,73 @@ class UserController extends Controller {
         }
 
           $this->respond($createdUser);
+    }
+
+    public function createHandler() {
+        $data = $this->getRequestData();
+
+        if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone']) || empty($data['typeOfLaws']) || empty($data['subjects'])) {
+            $this->respondWithError(400, "Missing required fields");
+            return;
+        }
+
+        $institution = new Institution($data['institution']['id'], $data['institution']['name']);
+        $image = $data['image'] ?? null;
+
+        $typeOfLaws = [];
+        foreach ($data['typeOfLaws'] as $type) {
+            $typeOfLowEnum = TypeOfLow::fromDatabase($type['description']);
+            if ($typeOfLowEnum !== null) {
+                $typeOfLaws[] = new TypeOfLaw($type['id'], $typeOfLowEnum);
+            }
+        }
+
+        $subjects = [];
+        foreach ($data['subjects'] as $subject) {
+            $subjects[] = new Subject($subject['id'], $subject['description']);
+        }
+        $user = new Handler(null, $data['firstname'], $data['lastname'], $data['email'], $data['password'], $institution, $image, $data['phone'], null, $typeOfLaws, $subjects);
+
+        if ($image !== null) {
+            $user->setImage($image);
+        }
+
+        $createdUser = $this->userService->createHandler($user);
+
+        if (!$createdUser) {
+            $this->respondWithError(500, "Failed to create user");
+            return;
+        }
+
+        $this->respond($createdUser);
+    }
+
+    public function createApplicant() {
+        $data = $this->getRequestData();
+
+        if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone']) || empty($data['education'])) {
+            $this->respondWithError(400, "Missing required fields");
+            return;
+        }
+
+        $institution = new Institution($data['institution']['id'], $data['institution']['name']);
+        $image = $data['image'] ?? null;
+        $education = new Education($data['education']['id'], $data['education']['name']);
+
+        $user = new Applicant(null, $data['firstname'], $data['lastname'], $data['email'], $data['password'], $institution, $image, $data['phone'], null, $education);
+
+        if ($image !== null) {
+            $user->setImage($image);
+        }
+
+        $createdUser = $this->userService->createApplicant($user);
+
+        if (!$createdUser) {
+            $this->respondWithError(500, "Failed to create user");
+            return;
+        }
+
+        $this->respond($createdUser);
     }
 
     public function update($id) {

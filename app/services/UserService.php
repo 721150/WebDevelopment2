@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\Models\Applicant;
+use App\Models\Handler;
 use App\Models\User;
 use App\Repositories\UserRepository;
 
@@ -33,6 +35,14 @@ class UserService {
 
     public function login(string $username, string $password) {
         return $this->userRepository->login($username, $password);
+    }
+
+    public function createHandler(Handler $user) {
+        return $this->userRepository->createHandler($user);
+    }
+
+    public function createApplicant(Applicant $user) {
+        return $this->userRepository->createApplicant($user);
     }
 }
 ?>

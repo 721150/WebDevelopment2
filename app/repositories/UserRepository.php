@@ -33,7 +33,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
         $email = $user->getEmail();
         $password = $user->getPassword();
         $institutionId = $user->getInstitution()->getId();
-        $image = $user->getImageString();
+        $image = $user->getImage();
         $phone = $user->getPhone();
 
         $stmt->bindParam(':firstname', $firstname);
@@ -45,7 +45,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
         $stmt->bindParam(':phone', $phone);
 
         $stmt->execute();
-        return $user;
+        return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
     }
 
     public function update(User $user) {
@@ -87,7 +87,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
             if ($result && password_verify($password, $result['password'])) {
                 $institution = new Institution($result['institutionId'], $result['institutionName']);
                 $education = new Education($result['educationId'], $result['educationName']);
-                $user = new Applicant($result['id'], $result['firstname'], $result['lastname'], $result['email'], $institution, $result['image'], $result['phone'], $result['applicantId'], $education);
+                $user = new Applicant($result['id'], $result['firstname'], $result['lastname'], $result['email'], null, $institution, $result['image'], $result['phone'], $result['applicantId'], $education);
             }
 
             if ($user == null) {
@@ -104,7 +104,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
                         $typeOfLaws[] = new TypeOfLaw($id, TypeOfLow::fromDatabase($description));
                     }
                     $subjects = explode(',', $result['subjects']);
-                    $user = new Handler($result['id'], $result['firstname'], $result['lastname'], $result['email'], $institution, $result['image'], $result['phone'], $result['handlerId'], $typeOfLaws, $subjects);
+                    $user = new Handler($result['id'], $result['firstname'], $result['lastname'], $result['email'], null, $institution, $result['image'], $result['phone'], $result['handlerId'], $typeOfLaws, $subjects);
                 }
             }
 
@@ -116,7 +116,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
 
                 if ($result && password_verify($password, $result['password'])) {
                     $institution = new Institution($result['institutionId'], $result['institutionName']);
-                    $user = new User($result['id'], $result['firstname'], $result['lastname'], $result['email'], $institution, $result['image'], $result['phone']);
+                    $user = new User($result['id'], $result['firstname'], $result['lastname'], $result['email'], null, $institution, $result['image'], $result['phone']);
                 }
             }
         } catch (Exception $e) {
@@ -124,5 +124,103 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
         }
 
         return $user;
+    }
+
+    public function createHandler(Handler $user) {
+        $this->connection->beginTransaction();
+
+        try {
+            $stmt = $this->connection->prepare("INSERT INTO `user` (firstname, lastname, email, password, institutionId, image, phone) VALUES (:firstname, :lastname, :email, :password, :institutionId, :image, :phone)");
+
+            $firstname = $user->getFirstname();
+            $lastname = $user->getLastname();
+            $email = $user->getEmail();
+            $password = $user->getPassword();
+            $institutionId = $user->getInstitution()->getId();
+            $image = $user->getImage();
+            $phone = $user->getPhone();
+
+            $stmt->bindParam(':firstname', $firstname);
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':image', $image);
+            $stmt->bindParam(':phone', $phone);
+
+            $stmt->execute();
+
+            $userId = $this->connection->lastInsertId();
+
+            $stmt = $this->connection->prepare("INSERT INTO `handler` (userId) VALUES (:userId)");
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+
+            $handlerId = $this->connection->lastInsertId();
+
+            foreach ($user->getTypeOfLaws() as $typeOfLaw) {
+                $stmt = $this->connection->prepare("INSERT INTO `handlerTypeOfLow` (handlerId, typeOfLawId) VALUES (:handlerId, :typeOfLawId)");
+                $typeOfLawId = $typeOfLaw->getId();
+                $stmt->bindParam(':handlerId', $handlerId);
+                $stmt->bindParam(':typeOfLawId', $typeOfLawId);
+                $stmt->execute();
+            }
+
+            foreach ($user->getSubjects() as $subject) {
+                $stmt = $this->connection->prepare("INSERT INTO `handlerSubject` (handlerId, subjectId) VALUES (:handlerId, :subjectId)");
+                $subjectId = $subject->getId();
+                $stmt->bindParam(':handlerId', $handlerId);
+                $stmt->bindParam(':subjectId', $subjectId);
+                $stmt->execute();
+            }
+
+            $this->connection->commit();
+
+            return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
+    }
+
+    public function createApplicant(Applicant $user) {
+        $this->connection->beginTransaction();
+
+        try {
+            $stmt = $this->connection->prepare("INSERT INTO `user` (firstname, lastname, email, password, institutionId, image, phone) VALUES (:firstname, :lastname, :email, :password, :institutionId, :image, :phone)");
+
+            $firstname = $user->getFirstname();
+            $lastname = $user->getLastname();
+            $email = $user->getEmail();
+            $password = $user->getPassword();
+            $institutionId = $user->getInstitution()->getId();
+            $image = $user->getImage();
+            $phone = $user->getPhone();
+
+            $stmt->bindParam(':firstname', $firstname);
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':image', $image);
+            $stmt->bindParam(':phone', $phone);
+
+            $stmt->execute();
+
+            $userId = $this->connection->lastInsertId();
+
+            $stmt = $this->connection->prepare("INSERT INTO `applicant` (userId, educationId) VALUES (:userId, :educationId)");
+            $educationId = $user->getEducation()->getId();
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':educationId', $educationId);
+            $stmt->execute();
+
+            $this->connection->commit();
+
+            return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 }

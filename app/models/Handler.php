@@ -2,12 +2,12 @@
 namespace App\Models;
 
 class Handler extends User {
-    private int $userId;
+    private ?int $userId;
     private array $typeOfLaws = [];
     private array $subjects = [];
 
-    public function __construct(int $id, string $firstname, string $lastname, string $email, Institution $institution, ?string $image, string $phone, int $userId, array $typeOfLaws = [], array $subjects = []) {
-        parent::__construct($id, $firstname, $lastname, $email, $institution, $image, $phone);
+    public function __construct(?int $id, string $firstname, string $lastname, string $email, string $password, Institution $institution, ?string $image, string $phone, ?int $userId, array $typeOfLaws = [], array $subjects = []) {
+        parent::__construct($id, $firstname, $lastname, $email, $password, $institution, $image, $phone);
         $this->userId = $userId;
         $this->typeOfLaws = $typeOfLaws;
         $this->subjects = $subjects;

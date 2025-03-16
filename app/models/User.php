@@ -67,21 +67,11 @@ class User {
     }
 
     public function getImage() {
-        if ($this->image !== null) {
-            return 'data:image/jpeg;base64,' . base64_encode($this->image);
-        }
-        return null;
-    }
-
-    public function getImageString() {
         return $this->image;
     }
 
     public function setImage(string $image) {
-        if (is_array($image) && isset($image['tmp_name']) && !empty($image['tmp_name'])) {
-            $imageData = file_get_contents($image['tmp_name']);
-            $this->image = $imageData;
-        }
+        $this->image = base64_decode($image);
     }
 
     public function getPhone() {

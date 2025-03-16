@@ -31,6 +31,8 @@ $router->put('/cases/(\d+)', 'CaseController@update');
 $router->get('/users', 'UserController@getAll');
 $router->get('/users/(\d+)', 'UserController@getOne');
 $router->post('/users/admin', 'UserController@createAdmin');
+$router->post('/users/handler', 'UserController@createHandler');
+$router->post('/users/applicant', 'UserController@createApplicant');
 $router->put('/users/(\d+)', 'UserController@update');
 $router->delete('/users/(\d+)', 'UserController@delete');
 $router->get('/users/login', 'UserController@login');
