@@ -160,27 +160,48 @@ class UserController extends Controller {
     public function update($id) {
         $data = $this->getRequestData();
 
-        if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['institution']) || empty($data['phone'])) {
+        if (empty($data['id']) || empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['institution']) || empty($data['phone'])) {
             $this->respondWithError(400, "Missing required fields");
             return;
         }
 
         $institution = new Institution($data['institution']['id'], $data['institution']['name']);
-        $image = $data['image'] ?? null; // Maak de afbeelding optioneel
-        $user = new User(
-            $id,
-            $data['firstname'],
-            $data['lastname'],
-            $data['email'],
-            $institution,
-            $image,
-            $data['phone']
-        );
+        $image = $data['image'] ?? null;
 
-        $updatedUser = $this->userService->update($user);
+        if (!empty($data['userId']) && !empty($data['subjects'])) {
+            if (empty($data['userId']) || empty($data['typeOfLaws']) || empty($data['subjects'])) {
+                $this->respondWithError(400, "Missing required fields");
+                return;
+            }
 
-        if (!$updatedUser) {
-            $this->respondWithError(500, "Failed to update user");
+            $typeOfLaws = array_map(function($typeOfLaw) {
+                return new TypeOfLaw($typeOfLaw['id'], TypeOfLow::fromDatabase($typeOfLaw['description']));
+            }, $data['typeOfLaws']);
+
+            $subjects = array_map(function($subject) {
+                return new Subject($subject['id'], $subject['description']);
+            }, $data['subjects']);
+            $user = new Handler($id, $data['firstname'], $data['lastname'], $data['email'], null, $institution, null, $data['phone'], $data['userId'], $typeOfLaws, $subjects);
+        } elseif (!empty($data['education'])) {
+            if (empty($data['userId']) || empty($data['education'])) {
+                $this->respondWithError(400, "Missing required fields");
+                return;
+            }
+            $education = new Education($data['education']['id'], $data['education']['name']);
+            $user = new Applicant($id, $data['firstname'], $data['lastname'], $data['email'], null, $institution, null, $data['phone'], $data['userId'], $education);
+        } else {
+            $user = new User($id, $data['firstname'], $data['lastname'], $data['email'], null, $institution, null, $data['phone']);
+        }
+
+        if ($image !== null) {
+            list(, $image) = explode(',', $image);
+            $user->setImage($image);
+        }
+
+        try {
+            $updatedUser = $this->userService->update($user);
+        } catch (PDOException $e) {
+            $this->respondWithError(500, "Failed to update user: " . $e->getMessage());
             return;
         }
 

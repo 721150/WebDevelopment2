@@ -25,7 +25,7 @@ class UserService {
         return $this->userRepository->createAdmin($user);
     }
 
-    public function update(User $user) {
+    public function update($user) {
         return $this->userRepository->update($user);
     }
 

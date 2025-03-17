@@ -100,30 +100,75 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
         $stmt->bindParam(':phone', $phone);
 
         $stmt->execute();
-        return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
+        return $this->getOne($user->getId());
     }
 
-    public function update(User $user) {
-        $stmt = $this->connection->prepare("UPDATE `user` SET firstname = :firstname, lastname = :lastname, email = :email, institutionId = :institutionId, image = :image, phone = :phone WHERE id = :id");
+    public function update($user) {
+        $this->connection->beginTransaction();
 
-        $firstname = $user->getFirstname();
-        $lastname = $user->getLastname();
-        $email = $user->getEmail();
-        $institutionId = $user->getInstitution()->getId();
-        $image = $user->getImage();
-        $phone = $user->getPhone();
-        $id = $user->getId();
+        try {
+            $stmt = $this->connection->prepare("UPDATE `user` SET firstname = :firstname, lastname = :lastname, email = :email, institutionId = :institutionId, image = :image, phone = :phone WHERE id = :id");
 
-        $stmt->bindParam(':firstname', $firstname);
-        $stmt->bindParam(':lastname', $lastname);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':institutionId', $institutionId);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':id', $id);
+            $firstname = $user->getFirstname();
+            $lastname = $user->getLastname();
+            $email = $user->getEmail();
+            $institutionId = $user->getInstitution()->getId();
+            $image = $user->getImage();
+            $phone = $user->getPhone();
+            $id = $user->getId();
 
-        $stmt->execute();
-        return $this->getOne($id);
+            $stmt->bindParam(':firstname', $firstname);
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':image', $image);
+            $stmt->bindParam(':phone', $phone);
+            $stmt->bindParam(':id', $id);
+
+            $stmt->execute();
+
+            if ($user instanceof Handler) {
+                $stmt = $this->connection->prepare("DELETE FROM `handlerTypeOfLow` WHERE handlerId = :handlerId");
+                $userId = $user->getUserId();
+                $stmt->bindParam(':handlerId', $userId);
+                $stmt->execute();
+
+                $stmt = $this->connection->prepare("DELETE FROM `handlerSubject` WHERE handlerId = :handlerId");
+                $stmt->bindParam(':handlerId', $userId);
+                $stmt->execute();
+
+                foreach ($user->getTypeOfLaws() as $typeOfLaw) {
+                    $stmt = $this->connection->prepare("INSERT INTO `handlerTypeOfLow` (handlerId, typeOfLawId) VALUES (:handlerId, :typeOfLawId)");
+                    $typeOfLawId = $typeOfLaw->getId();
+                    $stmt->bindParam(':handlerId', $userId);
+                    $stmt->bindParam(':typeOfLawId', $typeOfLawId);
+                    $stmt->execute();
+                }
+
+                foreach ($user->getSubjects() as $subject) {
+                    $stmt = $this->connection->prepare("INSERT INTO `handlerSubject` (handlerId, subjectId) VALUES (:handlerId, :subjectId)");
+                    $subjectId = $subject->getId();
+                    $stmt->bindParam(':handlerId', $userId);
+                    $stmt->bindParam(':subjectId', $subjectId);
+                    $stmt->execute();
+                }
+            }
+
+            if ($user instanceof Applicant) {
+                $stmt = $this->connection->prepare("UPDATE `applicant` SET educationId = :educationId WHERE userId = :userId");
+                $educationId = $user->getEducation()->getId();
+                $userId = $user->getId();
+                $stmt->bindParam(':educationId', $educationId);
+                $stmt->bindParam(':userId', $userId);
+                $stmt->execute();
+            }
+
+            $this->connection->commit();
+            return $this->getOne($id);
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 
     public function delete(int $id) {
@@ -231,7 +276,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
 
             $this->connection->commit();
 
-            return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
+            return $this->getOne($user->getId());
         } catch (Exception $e) {
             $this->connection->rollBack();
             throw $e;
@@ -272,7 +317,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
 
             $this->connection->commit();
 
-            return true; // TODO dit aanpassen voor ophalen uit database via methode getOne
+            return $this->getOne($user->getId());
         } catch (Exception $e) {
             $this->connection->rollBack();
             throw $e;
