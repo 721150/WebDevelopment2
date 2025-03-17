@@ -26,7 +26,9 @@ class Applicant extends User implements JsonSerializable {
     }
 
     public function jsonSerialize(): array {
-        $vars = get_object_vars($this);
+        $vars = parent::jsonSerialize();
+        $vars['userId'] = $this->userId;
+        $vars['education'] = $this->education;
         return $vars;
     }
 }

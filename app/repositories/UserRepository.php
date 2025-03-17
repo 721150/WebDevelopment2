@@ -6,10 +6,12 @@ use App\Models\Education;
 use App\Models\Enums\TypeOfLow;
 use App\Models\Handler;
 use App\Models\Institution;
+use App\Models\Subject;
 use App\Models\TypeOfLaw;
 use Exception;
 use PDO;
 use App\Models\User;
+use PDOException;
 
 class UserRepository extends Repository { // TODO deze class werkzaam maken
 
@@ -20,15 +22,60 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
     }
 
     public function getOne(int $id) {
-        $stmt = $this->connection->prepare("SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.institutionId, u.image, u.phone, i.id as institution_id, i.name as institution_name FROM `user` u JOIN `institution` i ON u.institutionId = i.id WHERE u.id = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = null;
 
-        $institution = new Institution($row['institution_id'], $row['institution_name']);
-        $image = $row['image'] ?? null;
+        try {
+            $stmt = $this->connection->prepare("SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.institutionId, u.image, u.phone, i.id as institution_id, i.name as institution_name, h.id as handler_id, a.id as applicant_id FROM `user` u JOIN `institution` i ON u.institutionId = i.id LEFT JOIN `handler` h ON u.id = h.userId LEFT JOIN `applicant` a ON u.id = a.userId WHERE u.id = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $user = new User($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone']);
+            if (!$row) {
+                return $user;
+            }
+
+            $institution = new Institution($row['institution_id'], $row['institution_name']);
+            $image = $row['image'] ?? null;
+
+            $user = new User($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone']);
+
+            if ($row['handler_id']) {
+                $stmt = $this->connection->prepare("SELECT t.id as typeOfLaw_id, t.description as typeOfLaw_description FROM `handlerTypeOfLow` htl JOIN `typeOfLaw` t ON htl.typeOfLawId = t.id WHERE htl.handlerId = :handlerId");
+                $stmt->bindParam(':handlerId', $row['handler_id']);
+                $stmt->execute();
+                $typeOfLaws = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $stmt = $this->connection->prepare("SELECT s.id as subject_id, s.description as subject_description FROM `handlerSubject` hs JOIN `subject` s ON hs.subjectId = s.id WHERE hs.handlerId = :handlerId");
+                $stmt->bindParam(':handlerId', $row['handler_id']);
+                $stmt->execute();
+                $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $typeOfLawObjects = [];
+                for ($i = 0; $i < count($typeOfLaws); $i++) {
+                    $typeOfLaw = $typeOfLaws[$i];
+                    $typeOfLawObjects[] = new TypeOfLaw($typeOfLaw['typeOfLaw_id'], TypeOfLow::fromDatabase($typeOfLaw['typeOfLaw_description']));
+                }
+
+                $subjectObjects = [];
+                for ($i = 0; $i < count($subjects); $i++) {
+                    $subject = $subjects[$i];
+                    $subjectObjects[] = new Subject($subject['subject_id'], $subject['subject_description']);
+                }
+
+                $user = new Handler($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $row['handler_id'], $typeOfLawObjects, $subjectObjects);
+            } elseif ($row['applicant_id']) {
+                $stmt = $this->connection->prepare("SELECT e.id as education_id, e.name as education_name FROM `applicant` a JOIN `education` e ON a.educationId = e.id WHERE a.id = :applicantId");
+                $stmt->bindParam(':applicantId', $row['applicant_id']);
+                $stmt->execute();
+                $educationRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $education = new Education($educationRow['education_id'], $educationRow['education_name']);
+
+                $user = new Applicant($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $row['applicant_id'], $education);
+            }
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage());
+        }
 
         return $user;
     }

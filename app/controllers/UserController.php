@@ -11,6 +11,7 @@ use App\Models\TypeOfLaw;
 use App\Models\User;
 use App\Services\JwtService;
 use App\Services\UserService;
+use PDOException;
 
 class UserController extends Controller {
     private $userService;
@@ -48,7 +49,12 @@ class UserController extends Controller {
     }
 
     public function getOne($id) {
-        $user = $this->userService->getOne($id);
+        try {
+            $user = $this->userService->getOne($id);
+        } catch (PDOException $e) {
+            $this->respondWithError(500,"Failed to read user: " . $e->getMessage());
+            return;
+        }
 
         if (!$user) {
             $this->respondWithError(404, "User not found");

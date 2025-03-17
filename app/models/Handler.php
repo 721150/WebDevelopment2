@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
-class Handler extends User {
+use JsonSerializable;
+
+class Handler extends User implements JsonSerializable {
     private ?int $userId;
     private array $typeOfLaws = [];
     private array $subjects = [];
@@ -31,6 +33,14 @@ class Handler extends User {
 
     public function addSubject(Subject $subject) {
         $this->subjects[] = $subject;
+    }
+
+    public function jsonSerialize(): array {
+        $vars = parent::jsonSerialize();
+        $vars['userId'] = $this->userId;
+        $vars['typeOfLaws'] = $this->typeOfLaws;
+        $vars['subjects'] = $this->subjects;
+        return $vars;
     }
 }
 ?>
