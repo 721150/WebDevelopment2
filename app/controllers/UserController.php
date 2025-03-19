@@ -25,7 +25,12 @@ class UserController extends Controller {
     public function login() {
         $logindata = $this->getRequestData();
 
-        $user = $this->userService->login($logindata['username'], $logindata['password']);
+        try {
+            $user = $this->userService->login($logindata['username'], $logindata['password']);
+        } catch (PDOException $e) {
+            $this->respondWithError(500,"Failed to read user: " . $e->getMessage());
+            return;
+        }
 
         if (!$user) {
             $this->respondWithError(401,"Username or password is incorrect");

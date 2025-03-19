@@ -35,7 +35,7 @@ $router->post('/users/handler', 'UserController@createHandler');
 $router->post('/users/applicant', 'UserController@createApplicant');
 $router->put('/users/(\d+)', 'UserController@update');
 $router->delete('/users/(\d+)', 'UserController@delete');
-$router->get('/users/login', 'UserController@login');
+$router->post('/users/login', 'UserController@login');
 
 // Routes voor de opleidingen
 $router->get('/educations', 'EducationController@getAll');

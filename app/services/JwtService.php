@@ -14,7 +14,7 @@ class JwtService {
             'nbf' => time(),
             'exp' => time() + 3600,
             'sub' => $user->getId(),
-            'data' => [ "user" => $user->getFirstname() . " " . $user->getLastname(), "email" => $user->getEmail() ]
+            'data' => [ "user" => $user->getFirstname() . " " . $user->getLastname() ]
         ];
 
         $jwt = JWT::encode($payload, $key, 'HS256');
