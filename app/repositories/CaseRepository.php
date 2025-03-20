@@ -11,6 +11,7 @@ use App\Models\Education;
 use App\Models\Institution;
 use App\Models\Subject;
 use App\Models\TypeOfLaw;
+use PDOException;
 
 class CaseRepository extends Repository {
 
@@ -150,8 +151,9 @@ class CaseRepository extends Repository {
             $this->connection->commit();
 
             $newCase = new CaseModel($caseId, $case->getUser(), $case->getSubject(), $case->getTypeOfLaw(), $case->getContent(), $case->getStatus(), $case->getInstitution(), $case->getEducation(), $documents);
-        } catch (\Exception $e) {
+        } catch (PDOException $e) {
             $this->connection->rollBack();
+            throw $e;
         }
         return $newCase;
     }
