@@ -23,7 +23,8 @@ $router->delete('/blogs/(\d+)', 'BlogController@delete');
 
 // Routes voor de casus verbindingen
 $router->get('/cases', 'CaseController@getAll');
-$router->get('/cases/(\d+)', 'CaseController@getOne');
+$router->get('/cases/case/(\d+)', 'CaseController@getOne');
+$router->get('/cases/user/(\d+)', 'CaseController@getByUser');
 $router->post('/cases', 'CaseController@create');
 $router->put('/cases/(\d+)', 'CaseController@update');
 

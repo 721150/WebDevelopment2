@@ -26,4 +26,8 @@ class CaseService {
     public function update(CaseModel $case) {
         return $this->caseRepository->update($case);
     }
+
+    public function getByUser(int $userId) {
+        return $this->caseRepository->getByUser($userId);
+    }
 }

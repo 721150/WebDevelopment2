@@ -44,6 +44,21 @@ class CaseController extends Controller {
         $this->respond($case);
     }
 
+    public function getByUser($userId) {
+        try {
+            $cases = $this->caseService->getByUser($userId);
+        } catch (PDOException $e) {
+            $this->respondWithError(500, $e->getMessage());
+        }
+
+        if (!$cases) {
+            $this->respondWithError(404, "Case not found");
+            return;
+        }
+
+        $this->respond($cases);
+    }
+
     public function create() {
         $data = $this->getRequestData();
 

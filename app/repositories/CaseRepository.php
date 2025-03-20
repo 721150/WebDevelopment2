@@ -234,4 +234,35 @@ class CaseRepository extends Repository {
             return null;
         }
     }
+
+    public function getByUser(int $userId) {
+        try {
+            $stmt = $this->connection->prepare("SELECT c.id, u.id AS userId, u.firstname, u.lastname, u.email, u.institutionId, u.image, u.phone, a.id AS applicantId, a.educationId, s.id AS subjectId, s.description AS subject, t.id AS typeOfLawId, t.description AS typeOfLaw, c.content, st.description AS status, i.name AS institution, e.name AS education FROM `case` c JOIN `user` u ON c.userId = u.id JOIN `applicant` a ON u.id = a.userId JOIN `subject` s ON c.subjectId = s.id JOIN `typeOfLaw` t ON c.typeOfLawId = t.id JOIN `status` st ON c.statusId = st.id JOIN `institution` i ON c.institutionId = i.id JOIN `education` e ON c.educationId = e.id WHERE c.userId = :userId");
+            $stmt->execute(['userId' => $userId]);
+
+            $cases = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $documentsStmt = $this->connection->prepare("SELECT id, document FROM document WHERE caseId = :caseId");
+                $documentsStmt->execute(['caseId' => $row['id']]);
+                $documents = [];
+                while ($documentRow = $documentsStmt->fetch(PDO::FETCH_ASSOC)) {
+                    $document = new Document(
+                        $documentRow['id'],
+                        base64_encode($documentRow['document'])
+                    );
+                    $documents[] = $document;
+                }
+
+                $image = $row['image'] ? base64_encode($row['image']) : null;
+
+                $case = new CaseModel($row['id'], new Applicant($row['userId'], $row['firstname'], $row['lastname'], $row['email'], null, new Institution($row['institutionId'], $row['institution']), $image, $row['phone'], $row['applicantId'], new Education($row['educationId'], $row['education'])), new Subject($row['subjectId'], $row['subject']), new TypeOfLaw($row['typeOfLawId'], TypeOfLow::fromDatabase($row['typeOfLaw'])), $row['content'], Status::fromDatabase($row['status']), new Institution($row['institutionId'], $row['institution']), new Education($row['educationId'], $row['education']), $documents);
+
+                $cases[] = $case;
+            }
+        } catch (PDOException $e) {
+            throw $e;
+        }
+
+        return $cases;
+    }
 }
