@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 20 mrt 2025 om 14:43
+-- Gegenereerd op: 20 mrt 2025 om 15:55
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.28
 
@@ -518,7 +518,7 @@ ALTER TABLE `blog`
 -- AUTO_INCREMENT voor een tabel `case`
 --
 ALTER TABLE `case`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT voor een tabel `document`

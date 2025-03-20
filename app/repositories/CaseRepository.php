@@ -86,6 +86,7 @@ class CaseRepository extends Repository {
                     $row['firstname'],
                     $row['lastname'],
                     $row['email'],
+                    null,
                     new Institution($row['institutionId'], $row['institution']),
                     $image,
                     $row['phone'],
