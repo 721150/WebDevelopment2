@@ -11,12 +11,16 @@ use App\Models\Institution;
 use App\Models\Subject;
 use App\Models\TypeOfLaw;
 use App\Services\CaseService;
+use App\Services\UserService;
+use PDOException;
 
 class CaseController extends Controller {
     private $caseService;
+    private $userService;
 
     function __construct() {
         $this->caseService = new CaseService();
+        $this->userService = new UserService();
     }
     public function getAll() {
         $cases = $this->caseService->getAll();
@@ -43,40 +47,28 @@ class CaseController extends Controller {
     public function create() {
         $data = $this->getRequestData();
 
-        if (empty($data['user']) || empty($data['subject']) || empty($data['typeOfLaw']) || empty($data['content']) || empty($data['status']) || empty($data['institution']) || empty($data['education'])) {
+        if (empty($data['user']) || empty($data['subject']) || empty($data['typeOfLaw']) || empty($data['content'])) {
             $this->respondWithError(400, "Missing required fields");
             return;
         }
 
-        $institution = new Institution($data['institution']['id'], $data['institution']['name']);
-        $education = new Education($data['education']['id'], $data['education']['name']);
-        $image = $data['user']['image'] ?? null;
-        $user = new Applicant($data['user']['id'], $data['user']['firstname'], $data['user']['lastname'], $data['user']['email'], $institution, $image, $data['user']['phone'], $data['user']['userId'], $education);
+        $user = $this->userService->getOne($data['user']);
         $subject = new Subject($data['subject']['id'], $data['subject']['description']);
         $typeOfLaw = new TypeOfLaw($data['typeOfLaw']['id'], TypeOfLow::fromDatabase($data['typeOfLaw']['description']));
-        $status = Status::fromDatabase($data['status']);
 
+        $case = new CaseModel(null, $user, $subject, $typeOfLaw, $data['content'], Status::Open, $user->getInstitution(), $user->getEducation(), []);
 
-        $documents = [];
-        if (!empty($data['documents'])) {
-            foreach ($data['documents'] as $doc) {
-                $documents[] = new Document(null, $doc['document']);
-            }
+        if (!empty($data['document'])) {
+            $document = new Document(null, $data['document']);
+            $case->addDocument($document);
         }
 
-        $case = new CaseModel(
-            null, // Zal door database worden gemaakt
-            $user,
-            $subject,
-            $typeOfLaw,
-            $data['content'],
-            $status,
-            $institution,
-            $education,
-            $documents
-        );
-
-        $createdCase = $this->caseService->create($case);
+        try {
+            $createdCase = $this->caseService->create($case);
+        } catch (PDOException $e) {
+            $this->respondWithError(500, "Failed to create case" . $e->getMessage());
+            return;
+        }
 
         if (!$createdCase) {
             $this->respondWithError(500, "Failed to create case");
