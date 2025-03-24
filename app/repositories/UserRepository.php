@@ -74,7 +74,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
                 $user = new Applicant($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $row['applicant_id'], $education);
             }
         } catch (PDOException $e) {
-            throw new PDOException($e->getMessage());
+            throw $e;
         }
 
         return $user;
@@ -86,7 +86,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
         $firstname = $user->getFirstname();
         $lastname = $user->getLastname();
         $email = $user->getEmail();
-        $password = $user->getPassword();
+        $password = password_hash($user->getPassword(), PASSWORD_DEFAULT);
         $institutionId = $user->getInstitution()->getId();
         $image = $user->getImage();
         $phone = $user->getPhone();
@@ -235,7 +235,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
             $firstname = $user->getFirstname();
             $lastname = $user->getLastname();
             $email = $user->getEmail();
-            $password = $user->getPassword();
+            $password = password_hash($user->getPassword(), PASSWORD_DEFAULT);
             $institutionId = $user->getInstitution()->getId();
             $image = $user->getImage();
             $phone = $user->getPhone();
@@ -292,7 +292,7 @@ class UserRepository extends Repository { // TODO deze class werkzaam maken
             $firstname = $user->getFirstname();
             $lastname = $user->getLastname();
             $email = $user->getEmail();
-            $password = $user->getPassword();
+            $password = password_hash($user->getPassword(), PASSWORD_DEFAULT);
             $institutionId = $user->getInstitution()->getId();
             $image = $user->getImage();
             $phone = $user->getPhone();

@@ -3,32 +3,27 @@ namespace App\Services;
 
 use App\Models\Blog;
 use App\Repositories\BlogRepository;
+use Exception;
 
 class BlogService {
-    private $blogRepository;
+    private BlogRepository $blogRepository;
 
     function __construct() {
         $this->blogRepository = new BlogRepository();
     }
 
-    public function getAll() {
+    /**
+     * @throws Exception
+     */
+    public function getAll(): array {
         return $this->blogRepository->getAll();
     }
 
-    public function getOne(int $id) {
-        return $this->blogRepository->getOne($id);
-    }
-
-    public function create(Blog $blog) {
+    /**
+     * @throws Exception
+     */
+    public function create(Blog $blog): Blog {
         return $this->blogRepository->create($blog);
-    }
-
-    public function delete(int $id) {
-        return $this->blogRepository->delete($id);
-    }
-
-    public function update(Blog $blog) {
-        return $this->blogRepository->update($blog);
     }
 }
 ?>

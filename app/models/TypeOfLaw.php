@@ -26,8 +26,7 @@ class TypeOfLaw implements JsonSerializable {
     }
 
     public function jsonSerialize(): array {
-        $vars = get_object_vars($this);
-        return $vars;
+        return get_object_vars($this);
     }
 }
 ?>
