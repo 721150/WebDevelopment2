@@ -19,7 +19,6 @@ $router->get('/blogs', 'BlogController@getAll');
 $router->post('/blogs', 'BlogController@create');
 
 // Routes voor de casus verbindingen
-$router->get('/cases', 'CaseController@getAll');
 $router->get('/cases/case/(\d+)', 'CaseController@getOne');
 $router->get('/cases/user/(\d+)', 'CaseController@getByUser');
 $router->post('/cases', 'CaseController@create');

@@ -10,33 +10,29 @@ use App\Models\Enums\TypeOfLow;
 use App\Models\Institution;
 use App\Models\Subject;
 use App\Models\TypeOfLaw;
+use App\Models\User;
 use App\Services\CaseService;
 use App\Services\UserService;
-use PDOException;
+use Exception;
 
 class CaseController extends Controller {
-    private $caseService;
-    private $userService;
+    private CaseService $caseService;
+    private UserService $userService;
 
     function __construct() {
         $this->caseService = new CaseService();
         $this->userService = new UserService();
     }
-    public function getAll() {
-        $cases = $this->caseService->getAll();
 
-        if (!$cases) {
-            $this->respondWithError(404, "Cases not found");
-            return;
+    public function getOne($id): void {
+        $case = null;
+        try {
+            $case = $this->caseService->getOne($id);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Case not found " . $exception->getMessage());
         }
 
-        $this->respond($cases);
-    }
-
-    public function getOne($id) {
-        $case = $this->caseService->getOne($id);
-
-        if (!$case) {
+        if ($case == null) {
             $this->respondWithError(404, "Case not found");
             return;
         }
@@ -44,76 +40,97 @@ class CaseController extends Controller {
         $this->respond($case);
     }
 
-    public function getByUser($userId) {
+    public function getByUser($userId): void {
         try {
             $cases = $this->caseService->getByUser($userId);
-        } catch (PDOException $e) {
-            $this->respondWithError(500, $e->getMessage());
+        } catch (Exception $exception) {
+            $this->respondWithError(500, $exception->getMessage());
         }
 
         $this->respond($cases);
     }
 
-    public function create() {
+    public function create(): void {
         $data = $this->getRequestData();
 
-        if (empty($data['user']) || empty($data['subject']) || empty($data['typeOfLaw']) || empty($data['content'])) {
-            $this->respondWithError(400, "Missing required fields");
+        $requiredFields = ['user', 'subject', 'typeOfLaw', 'content'];
+        if (!$this->validateRequiredFields($data, $requiredFields)) {
             return;
         }
 
         $user = $this->userService->getOne($data['user']);
-        $subject = new Subject($data['subject']['id'], $data['subject']['description']);
-        $typeOfLaw = new TypeOfLaw($data['typeOfLaw']['id'], TypeOfLow::fromDatabase($data['typeOfLaw']['description']));
-
-        $case = new CaseModel(null, $user, $subject, $typeOfLaw, $data['content'], Status::Open, $user->getInstitution(), $user->getEducation(), []);
+        $case = $this->createCaseFromData($data, $user);
 
         if (!empty($data['document'])) {
             $document = new Document(null, $data['document']);
             $case->addDocument($document);
         }
 
+        $createdCase = null;
         try {
             $createdCase = $this->caseService->create($case);
-        } catch (PDOException $e) {
-            $this->respondWithError(500, "Failed to create case" . $e->getMessage());
-            return;
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to create case " . $exception->getMessage());
         }
 
-        if (!$createdCase) {
+        if ($createdCase === null) {
             $this->respondWithError(500, "Failed to create case");
             return;
         }
-
         $this->respond($createdCase);
     }
 
-    public function update($id) {
+    public function update($id): void {
         $data = $this->getRequestData();
 
-        if (empty($data['user']) || empty($data['subject']) || empty($data['typeOfLaw']) || empty($data['content']) || empty($data['status']) || empty($data['institution']) || empty($data['education'])) {
-            $this->respondWithError(400, "Missing required fields");
+        $requiredFields = ['user', 'subject', 'typeOfLaw', 'content', 'status', 'institution', 'education'];
+        if (!$this->validateRequiredFields($data, $requiredFields)) {
             return;
         }
 
+        $user = $this->createUserFromData($data);
+        $case = $this->createCaseFromData($data, $user, $id);
+
+        $updatedCase = null;
+        try {
+            $updatedCase = $this->caseService->update($case);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to update case " . $exception->getMessage());
+        }
+
+        if ($updatedCase === null) {
+            $this->respondWithError(500, "Failed to update case");
+            return;
+        }
+        $this->respond($updatedCase);
+    }
+
+    private function validateRequiredFields($data, $requiredFields): bool {
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                $this->respondWithError(400, "Missing required fields");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function createUserFromData($data): User {
         $institution = new Institution($data['institution']['id'], $data['institution']['name']);
         $education = new Education($data['education']['id'], $data['education']['name']);
         $image = $data['user']['image'] ?? null;
-        $user = new Applicant(
-            $data['user']['id'],
-            $data['user']['firstname'],
-            $data['user']['lastname'],
-            $data['user']['email'],
-            $institution,
-            $image,
-            $data['user']['phone'],
-            $data['user']['userId'],
-            $education
-        );
+        return new Applicant($data['user']['id'], $data['user']['firstname'], $data['user']['lastname'], $data['user']['email'], null, $institution, $image, $data['user']['phone'], $data['user']['userId'], $education);
+    }
 
+    private function createCaseFromData($data, $user, $id = null): CaseModel {
         $subject = new Subject($data['subject']['id'], $data['subject']['description']);
         $typeOfLaw = new TypeOfLaw($data['typeOfLaw']['id'], TypeOfLow::fromDatabase($data['typeOfLaw']['description']));
-        $status = Status::fromDatabase($data['status']);
+        $status = null;
+        if (!empty($data['status'])) {
+            $status = Status::fromDatabase($data['status']);
+        } else {
+            $status = Status::Open;
+        }
 
         $documents = [];
         if (!empty($data['documents'])) {
@@ -122,26 +139,7 @@ class CaseController extends Controller {
             }
         }
 
-        $case = new CaseModel(
-            $id,
-            $user,
-            $subject,
-            $typeOfLaw,
-            $data['content'],
-            $status,
-            $institution,
-            $education,
-            $documents
-        );
-
-        $updatedCase = $this->caseService->update($case);
-
-        if (!$updatedCase) {
-            $this->respondWithError(500, "Failed to update case");
-            return;
-        }
-
-        $this->respond($updatedCase);
+        return new CaseModel($id, $user, $subject, $typeOfLaw, $data['content'], $status, $user->getInstitution(), $user->getEducation(), $documents);
     }
 }
 ?>
