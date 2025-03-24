@@ -4,14 +4,14 @@ namespace App\Services;
 use App\Repositories\EducationRepository;
 
 class EducationService {
-    private $courceRepository;
+    private EducationRepository $educationRepository;
 
     public function __construct() {
-        $this->courceRepository = new EducationRepository();
+        $this->educationRepository = new EducationRepository();
     }
 
-    public function getAll() {
-        return $this->courceRepository->getAll();
+    public function getAll(): array {
+        return $this->educationRepository->getAll();
     }
 }
 ?>

@@ -4,13 +4,13 @@ namespace App\Services;
 use App\Repositories\InstitutionRepository;
 
 class InstitutionService {
-    private $institutionRepository;
+    private InstitutionRepository $institutionRepository;
 
     public function __construct() {
         $this->institutionRepository = new InstitutionRepository();
     }
 
-    public function getAll() {
+    public function getAll(): array {
         return $this->institutionRepository->getAll();
     }
 }

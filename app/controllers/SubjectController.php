@@ -2,22 +2,28 @@
 namespace App\Controllers;
 
 use App\Services\SubjectService;
+use Exception;
 
 class SubjectController extends Controller {
-    private $subjectService;
+    private SubjectService $subjectService;
 
     function __construct() {
         $this->subjectService = new SubjectService();
     }
-    public function getAll() {
-        $users = $this->subjectService->getAll();
+    public function getAll(): void {
+        $subjects = null;
+        try {
+            $subjects = $this->subjectService->getAll();
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Subject not found " . $exception->getMessage());
+        }
 
-        if (!$users) {
+        if ($subjects == null) {
             $this->respondWithError(404, "Subject not found");
             return;
         }
 
-        $this->respond($users);
+        $this->respond($subjects);
     }
 }
 ?>

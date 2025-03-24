@@ -2,22 +2,28 @@
 namespace App\Controllers;
 
 use App\Services\EducationService;
+use Exception;
 
 class EducationController extends Controller {
-    private $courceService;
+    private EducationService $educationService;
 
     function __construct() {
-        $this->courceService = new EducationService();
+        $this->educationService = new EducationService();
     }
-    public function getAll() {
-        $users = $this->courceService->getAll();
+    public function getAll(): void {
+        $educations = null;
+        try {
+            $educations = $this->educationService->getAll();
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Educations not found " . $exception->getMessage());
+        }
 
-        if (!$users) {
+        if ($educations == null) {
             $this->respondWithError(404, "Educations not found");
             return;
         }
 
-        $this->respond($users);
+        $this->respond($educations);
     }
 }
 ?>

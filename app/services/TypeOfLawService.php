@@ -4,13 +4,13 @@ namespace App\Services;
 use App\Repositories\TypeOfLowRepository;
 
 class TypeOfLawService {
-    private $typeOfLowRepository;
+    private TypeOfLowRepository $typeOfLowRepository;
 
     public function __construct() {
         $this->typeOfLowRepository = new TypeOfLowRepository();
     }
 
-    public function getAll() {
+    public function getAll(): array {
         return $this->typeOfLowRepository->getAll();
     }
 }

@@ -4,15 +4,15 @@ namespace App\Controllers;
 use App\Models\Reactie;
 use App\Services\ReactieService;
 use DateTime;
+use Exception;
 
 class ReactieController extends Controller {
-    private $reactieService;
+    private ReactieService $reactieService;
 
     function __construct() {
         $this->reactieService = new ReactieService();
     }
-    public function create()
-    {
+    public function create(): void {
         $data = $this->getRequestData();
 
         if (empty($data['blogId']) || empty($data['reactie'])) {
@@ -24,9 +24,14 @@ class ReactieController extends Controller {
 
         $reactie = new Reactie(null, $currentDateTime, $data['reactie']['content']);
 
-        $createdReactie = $this->reactieService->create($reactie, $data['blogId']);
+        $createdReactie = null;
+        try {
+            $createdReactie = $this->reactieService->create($reactie, $data['blogId']);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to create blog " . $exception->getMessage());
+        }
 
-        if (!$createdReactie) {
+        if ($createdReactie == null) {
             $this->respondWithError(500, "Failed to create blog");
             return;
         }
