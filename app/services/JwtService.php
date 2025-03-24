@@ -5,7 +5,7 @@ use App\Models\User;
 use Firebase\JWT\JWT;
 
 class JwtService {
-    public function generateJwt(User $user) {
+    public function generateJwt(User $user): string {
         $key = 'studieknallers';
         $payload = [
             'iss' => 'http://inholland.nl',
@@ -17,8 +17,7 @@ class JwtService {
             'data' => [ "user" => $user->getFirstname() . " " . $user->getLastname() ]
         ];
 
-        $jwt = JWT::encode($payload, $key, 'HS256');
-        return $jwt;
+        return JWT::encode($payload, $key, 'HS256');
     }
 }
 ?>
