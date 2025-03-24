@@ -51,11 +51,6 @@ class CaseController extends Controller {
             $this->respondWithError(500, $e->getMessage());
         }
 
-        if (!$cases) {
-            $this->respondWithError(404, "Case not found");
-            return;
-        }
-
         $this->respond($cases);
     }
 

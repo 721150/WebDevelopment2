@@ -83,7 +83,7 @@ class BlogRepository extends Repository {
      * @param mixed $row
      * @return Blog
      */
-    public function getReacties(mixed $row): Blog
+    private function getReacties(mixed $row): Blog
     {
         try {
             $reactiesStmt = $this->connection->prepare("SELECT id, dateTime, content FROM reactie WHERE blogId = :blogId");

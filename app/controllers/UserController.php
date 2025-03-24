@@ -11,24 +11,24 @@ use App\Models\TypeOfLaw;
 use App\Models\User;
 use App\Services\JwtService;
 use App\Services\UserService;
-use PDOException;
+use Exception;
 
 class UserController extends Controller {
-    private $userService;
-    private $jwtService;
+    private UserService $userService;
+    private JwtService $jwtService;
 
     function __construct() {
         $this->userService = new UserService();
         $this->jwtService = new JwtService();
     }
 
-    public function login() {
+    public function login(): void {
         $logindata = $this->getRequestData();
 
         try {
             $user = $this->userService->login($logindata['username'], $logindata['password']);
-        } catch (PDOException $e) {
-            $this->respondWithError(500,"Failed to read user: " . $e->getMessage());
+        } catch (Exception $exception) {
+            $this->respondWithError(500,"Failed to read user: " . $exception->getMessage());
             return;
         }
 
@@ -42,10 +42,15 @@ class UserController extends Controller {
         $this->respond($jwt);
     }
 
-    public function getAll() {
-        $users = $this->userService->getAll();
+    public function getAll(): void {
+        $users = null;
+        try {
+            $users = $this->userService->getAll();
+        } catch (Exception $exception) {
+            $this->respondWithError(500,"Failed to read users: " . $exception->getMessage());
+        }
 
-        if (!$users) {
+        if ($users == null) {
             $this->respondWithError(404, "Users not found");
             return;
         }
@@ -53,11 +58,11 @@ class UserController extends Controller {
         $this->respond($users);
     }
 
-    public function getOne($id) {
+    public function getOne($id): void {
         try {
             $user = $this->userService->getOne($id);
-        } catch (PDOException $e) {
-            $this->respondWithError(500,"Failed to read user: " . $e->getMessage());
+        } catch (Exception $exception) {
+            $this->respondWithError(500,"Failed to read user: " . $exception->getMessage());
             return;
         }
 
@@ -69,7 +74,7 @@ class UserController extends Controller {
         $this->respond($user);
     }
 
-    public function createAdmin() {
+    public function createAdmin(): void {
         $data = $this->getRequestData();
 
         if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone'])) {
@@ -85,9 +90,14 @@ class UserController extends Controller {
             $user->setImage($image);
         }
 
-        $createdUser = $this->userService->createAdmin($user);
+        $createdUser = null;
+        try {
+            $createdUser = $this->userService->createAdmin($user);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to create user: " . $exception->getMessage());
+        }
 
-        if (!$createdUser) {
+        if ($createdUser == null) {
             $this->respondWithError(500, "Failed to create user");
             return;
         }
@@ -95,7 +105,7 @@ class UserController extends Controller {
           $this->respond($createdUser);
     }
 
-    public function createHandler() {
+    public function createHandler(): void {
         $data = $this->getRequestData();
 
         if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone']) || empty($data['typeOfLaws']) || empty($data['subjects'])) {
@@ -124,9 +134,14 @@ class UserController extends Controller {
             $user->setImage($image);
         }
 
-        $createdUser = $this->userService->createHandler($user);
+        $createdUser = null;
+        try {
+            $createdUser = $this->userService->createHandler($user);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to create user: " . $exception->getMessage());
+        }
 
-        if (!$createdUser) {
+        if ($createdUser == null) {
             $this->respondWithError(500, "Failed to create user");
             return;
         }
@@ -134,7 +149,7 @@ class UserController extends Controller {
         $this->respond($createdUser);
     }
 
-    public function createApplicant() {
+    public function createApplicant(): void {
         $data = $this->getRequestData();
 
         if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['password']) || empty($data['institution']) || empty($data['phone']) || empty($data['education'])) {
@@ -152,9 +167,14 @@ class UserController extends Controller {
             $user->setImage($image);
         }
 
-        $createdUser = $this->userService->createApplicant($user);
+        $createdUser = null;
+        try {
+            $createdUser = $this->userService->createApplicant($user);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to create user: " . $exception->getMessage());
+        }
 
-        if (!$createdUser) {
+        if ($createdUser == null) {
             $this->respondWithError(500, "Failed to create user");
             return;
         }
@@ -162,7 +182,7 @@ class UserController extends Controller {
         $this->respond($createdUser);
     }
 
-    public function update($id) {
+    public function update($id): void {
         $data = $this->getRequestData();
 
         if (empty($data['id']) || empty($data['firstname']) || empty($data['lastname']) || empty($data['email']) || empty($data['institution']) || empty($data['phone'])) {
@@ -174,7 +194,7 @@ class UserController extends Controller {
         $image = $data['image'] ?? null;
 
         if (!empty($data['userId']) && !empty($data['subjects'])) {
-            if (empty($data['userId']) || empty($data['typeOfLaws']) || empty($data['subjects'])) {
+            if (empty($data['typeOfLaws'])) {
                 $this->respondWithError(400, "Missing required fields");
                 return;
             }
@@ -188,7 +208,7 @@ class UserController extends Controller {
             }, $data['subjects']);
             $user = new Handler($id, $data['firstname'], $data['lastname'], $data['email'], null, $institution, null, $data['phone'], $data['userId'], $typeOfLaws, $subjects);
         } elseif (!empty($data['education'])) {
-            if (empty($data['userId']) || empty($data['education'])) {
+            if (empty($data['userId'])) {
                 $this->respondWithError(400, "Missing required fields");
                 return;
             }
@@ -205,16 +225,20 @@ class UserController extends Controller {
 
         try {
             $updatedUser = $this->userService->update($user);
-        } catch (PDOException $e) {
-            $this->respondWithError(500, "Failed to update user: " . $e->getMessage());
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to update user: " . $exception->getMessage());
             return;
         }
 
         $this->respond($updatedUser);
     }
 
-    public function delete($id) {
-        $deleted = $this->userService->delete($id);
+    public function delete($id): void {
+        try {
+            $deleted = $this->userService->delete($id);
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Failed to delete user: " . $exception->getMessage());
+        }
 
         if (!$deleted) {
             $this->respondWithError(500, "Failed to delete user");
