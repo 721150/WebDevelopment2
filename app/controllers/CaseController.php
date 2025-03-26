@@ -25,6 +25,22 @@ class CaseController extends Controller {
         $this->userService = new UserService();
     }
 
+    public function getAll(): void {
+        $cases = [];
+        try {
+            $cases = $this->caseService->getAll();
+        } catch (Exception $exception) {
+            $this->respondWithError(500, "Cases not found " . $exception->getMessage());
+        }
+
+        if (empty($cases)) {
+            $this->respondWithError(404, "Cases not found");
+            return;
+        }
+
+        $this->respond($cases);
+    }
+
     public function getOne($id): void {
         $case = null;
         try {

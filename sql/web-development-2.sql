@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 26 mrt 2025 om 18:16
+-- Gegenereerd op: 26 mrt 2025 om 18:43
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.28
 
@@ -97,7 +97,7 @@ INSERT INTO `case` (`id`, `userId`, `subjectId`, `typeOfLawId`, `content`, `stat
 (3, 3, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen? Weet niet wat ik er mee moet. Wat te doen:((', 1, 1, 16),
 (64, 1, 3, 3, 'Wat kan ik doen als ik niet op stage mag ondanks dat ik aan alle voorwaarden voldoe?', 1, 1, 16),
 (65, 1, 5, 4, 'Vindt het collegegeld te hoog voor het aantal vakken dat ik volg.', 1, 1, 16),
-(66, 1, 11, 1, 'Waar kan ik iets aanvragen????', 1, 1, 16);
+(66, 1, 11, 1, 'Waar kan ik iets aanvragen????', 2, 1, 16);
 
 -- --------------------------------------------------------
 

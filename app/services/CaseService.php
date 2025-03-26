@@ -11,6 +11,10 @@ class CaseService {
         $this->caseRepository = new CaseRepository();
     }
 
+    public function getAll() {
+        return $this->caseRepository->getAll();
+    }
+
     public function getOne(int $id): ?CaseModel {
         return $this->caseRepository->getOne($id);
     }
