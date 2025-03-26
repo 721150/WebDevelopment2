@@ -26,7 +26,7 @@ class CaseRepository extends Repository {
             $documentsStmt->execute(['caseId' => $row['id']]);
             $documents = [];
             while ($documentRow = $documentsStmt->fetch(PDO::FETCH_ASSOC)) {
-                $document = new Document($documentRow['id'], base64_encode($documentRow['document']));
+                $document = new Document($documentRow['id'], $documentRow['document']);
                 $documents[] = $document;
             }
 
@@ -103,7 +103,7 @@ class CaseRepository extends Repository {
                 $documentsStmt->execute(['caseId' => $row['id']]);
                 $documents = [];
                 while ($documentRow = $documentsStmt->fetch(PDO::FETCH_ASSOC)) {
-                    $document = new Document($documentRow['id'], base64_encode($documentRow['document']));
+                    $document = new Document($documentRow['id'], $documentRow['document']);
                     $documents[] = $document;
                 }
 

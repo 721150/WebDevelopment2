@@ -12,15 +12,15 @@ class Document implements JsonSerializable {
         $this->document = $document;
     }
 
-    public function getId() {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getDocument() {
+    public function getDocument(): string {
         return $this->document;
     }
 
-    public function setDocument(string $document) {
+    public function setDocument(string $document): void {
         $this->document = $document;
     }
 
@@ -28,5 +28,4 @@ class Document implements JsonSerializable {
         return get_object_vars($this);
     }
 }
-
 ?>

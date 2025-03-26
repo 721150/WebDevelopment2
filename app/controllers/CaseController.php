@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\CaseService;
 use App\Services\UserService;
 use Exception;
+use Random\RandomException;
 
 class CaseController extends Controller {
     private CaseService $caseService;
@@ -50,20 +51,34 @@ class CaseController extends Controller {
         $this->respond($cases);
     }
 
+    /**
+     * @throws RandomException
+     */
     public function create(): void {
-        $data = $this->getRequestData();
-
         $requiredFields = ['user', 'subject', 'typeOfLaw', 'content'];
-        if (!$this->validateRequiredFields($data, $requiredFields)) {
-            return;
+        $data = [];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($_POST[$field])) {
+                $this->respondWithError(400, "Missing required field: $field");
+                return;
+            }
+            $data[$field] = $_POST[$field];
         }
 
         $user = $this->userService->getOne($data['user']);
         $case = $this->createCaseFromData($data, $user);
 
-        if (!empty($data['document'])) {
-            $document = new Document(null, $data['document']);
-            $case->addDocument($document);
+        if (!empty($_FILES['document'])) {
+            list($file, $filePath) = $this->handleDocuments();
+
+            if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                $document = new Document(null, $filePath);
+                $case->addDocument($document);
+            } else {
+                $this->respondWithError(500, "Failed to upload file");
+                return;
+            }
         }
 
         $createdCase = null;
@@ -140,6 +155,23 @@ class CaseController extends Controller {
         }
 
         return new CaseModel($id, $user, $subject, $typeOfLaw, $data['content'], $status, $user->getInstitution(), $user->getEducation(), $documents);
+    }
+
+    /**
+     * @return array
+     * @throws RandomException
+     */
+    public function handleDocuments(): array {
+        $file = $_FILES['document'];
+        $uploadDirectory = './documents/';
+
+        // Genereer een willekeurige reeks van 10 tekens om een dubbele bestandsnaam te voorkomen
+        $randomString = bin2hex(random_bytes(10));
+        $fileName = pathinfo($file['name'], PATHINFO_FILENAME);
+        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $newFileName = $fileName . '_' . $randomString . '.' . $fileExtension;
+        $filePath = $uploadDirectory . $newFileName;
+        return array($file, $filePath);
     }
 }
 ?>
