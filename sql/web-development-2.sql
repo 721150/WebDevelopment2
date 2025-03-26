@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 26 mrt 2025 om 14:28
+-- Gegenereerd op: 26 mrt 2025 om 18:16
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.28
 
@@ -78,7 +78,7 @@ INSERT INTO `blog` (`id`, `dateTime`, `institutionId`, `educationId`, `subjectId
 
 CREATE TABLE `case` (
   `id` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
+  `userId` int(11) DEFAULT NULL,
   `subjectId` int(11) NOT NULL,
   `typeOfLawId` int(11) NOT NULL,
   `content` varchar(15000) NOT NULL,
@@ -95,7 +95,29 @@ INSERT INTO `case` (`id`, `userId`, `subjectId`, `typeOfLawId`, `content`, `stat
 (1, 1, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen?', 1, 1, 16),
 (2, 2, 6, 3, 'Wat kan ik doen als iemand verveld tegen met doet?', 3, 16, 4),
 (3, 3, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen? Weet niet wat ik er mee moet. Wat te doen:((', 1, 1, 16),
-(64, 1, 3, 3, 'Wat kan ik doen als ik niet op stage mag ondanks dat ik aan alle voorwaarden voldoe?', 1, 1, 16);
+(64, 1, 3, 3, 'Wat kan ik doen als ik niet op stage mag ondanks dat ik aan alle voorwaarden voldoe?', 1, 1, 16),
+(65, 1, 5, 4, 'Vindt het collegegeld te hoog voor het aantal vakken dat ik volg.', 1, 1, 16),
+(66, 1, 11, 1, 'Waar kan ik iets aanvragen????', 1, 1, 16);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `communication`
+--
+
+CREATE TABLE `communication` (
+  `id` int(11) NOT NULL,
+  `handler` int(11) DEFAULT NULL,
+  `content` varchar(5000) NOT NULL,
+  `caseId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `communication`
+--
+
+INSERT INTO `communication` (`id`, `handler`, `content`, `caseId`) VALUES
+(1, 4, 'Dat kan bij de examencommissie.', 66);
 
 -- --------------------------------------------------------
 
@@ -114,7 +136,9 @@ CREATE TABLE `document` (
 --
 
 INSERT INTO `document` (`id`, `caseId`, `document`) VALUES
-(34, 64, './documents/Stagevoorstel_formulier_Informatica_55244b5aedcaad2c03e3.doc');
+(34, 64, './documents/Stagevoorstel_formulier_Informatica_55244b5aedcaad2c03e3.doc'),
+(35, 65, './documents/Homework and LABS Lesson 1 - set-up Moba with SSH-V1.0_38a1bfd20dd533d1d26d.odt'),
+(36, 66, './documents/EX3 and EX4_d11a22bd0f45f73471bd.pptx');
 
 -- --------------------------------------------------------
 
@@ -409,7 +433,15 @@ ALTER TABLE `case`
   ADD KEY `statusId` (`statusId`),
   ADD KEY `subjectId` (`subjectId`),
   ADD KEY `typeOfLawId` (`typeOfLawId`),
-  ADD KEY `userId` (`userId`);
+  ADD KEY `case_ibfk_6` (`userId`);
+
+--
+-- Indexen voor tabel `communication`
+--
+ALTER TABLE `communication`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`handler`),
+  ADD KEY `caseId` (`caseId`);
 
 --
 -- Indexen voor tabel `document`
@@ -505,13 +537,19 @@ ALTER TABLE `blog`
 -- AUTO_INCREMENT voor een tabel `case`
 --
 ALTER TABLE `case`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+
+--
+-- AUTO_INCREMENT voor een tabel `communication`
+--
+ALTER TABLE `communication`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT voor een tabel `document`
 --
 ALTER TABLE `document`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT voor een tabel `education`
@@ -602,7 +640,14 @@ ALTER TABLE `case`
   ADD CONSTRAINT `case_ibfk_3` FOREIGN KEY (`statusId`) REFERENCES `status` (`id`),
   ADD CONSTRAINT `case_ibfk_4` FOREIGN KEY (`subjectId`) REFERENCES `subject` (`id`),
   ADD CONSTRAINT `case_ibfk_5` FOREIGN KEY (`typeOfLawId`) REFERENCES `typeOfLaw` (`id`),
-  ADD CONSTRAINT `case_ibfk_6` FOREIGN KEY (`userId`) REFERENCES `user` (`id`);
+  ADD CONSTRAINT `case_ibfk_6` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+--
+-- Beperkingen voor tabel `communication`
+--
+ALTER TABLE `communication`
+  ADD CONSTRAINT `communication_ibfk_1` FOREIGN KEY (`handler`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  ADD CONSTRAINT `communication_ibfk_2` FOREIGN KEY (`caseId`) REFERENCES `case` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Beperkingen voor tabel `document`

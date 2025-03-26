@@ -49,5 +49,8 @@ $router->get('/typesOfLows', 'TypeOfLowController@getAll');
 // Routes voor de reacties
 $router->post('/reacties', 'ReactieController@create');
 
+// Routes voor antwoorden
+$router->get('/communications/(\d+)', 'CommunicationController@getOne');
+
 $router->run();
 ?>
