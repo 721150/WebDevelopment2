@@ -114,12 +114,12 @@ class CaseController extends Controller {
     public function update($id): void {
         $data = $this->getRequestData();
 
-        $requiredFields = ['user', 'subject', 'typeOfLaw', 'content', 'status', 'institution', 'education'];
+        $requiredFields = ['user', 'subject', 'typeOfLaw', 'content', 'status'];
         if (!$this->validateRequiredFields($data, $requiredFields)) {
             return;
         }
 
-        $user = $this->createUserFromData($data);
+        $user = $this->userService->getOne($data['user']);
         $case = $this->createCaseFromData($data, $user, $id);
 
         $updatedCase = null;
@@ -144,13 +144,6 @@ class CaseController extends Controller {
             }
         }
         return true;
-    }
-
-    private function createUserFromData($data): User {
-        $institution = new Institution($data['institution']['id'], $data['institution']['name']);
-        $education = new Education($data['education']['id'], $data['education']['name']);
-        $image = $data['user']['image'] ?? null;
-        return new Applicant($data['user']['id'], $data['user']['firstname'], $data['user']['lastname'], $data['user']['email'], null, $institution, $image, $data['user']['phone'], $data['user']['userId'], $education);
     }
 
     private function createCaseFromData($data, $user, $id = null): CaseModel {

@@ -316,7 +316,9 @@ class UserRepository extends Repository {
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute([':email' => $username]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result !== false ? $result : null;
     }
 
     private function fetchUserDetails(array $row): User|Applicant|Handler {
