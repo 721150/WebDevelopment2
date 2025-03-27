@@ -11,9 +11,19 @@ class TypeOfLowController extends Controller {
         $this->typeOfLowService = new TypeOfLawService();
     }
     public function getAll(): void {
+        $offset = null;
+        $limit = null;
+
+        if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
+            $offset = $_GET["offset"];
+        }
+        if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
+            $limit = $_GET["limit"];
+        }
+
         $typeOfLows = null;
         try {
-            $typeOfLows = $this->typeOfLowService->getAll();
+            $typeOfLows = $this->typeOfLowService->getAll($offset, $limit);
         } catch (Exception $exception) {
             $this->respondWithError(500, "Type Of Low not found " . $exception->getMessage());
         }

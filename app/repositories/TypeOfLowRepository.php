@@ -7,9 +7,19 @@ use PDO;
 use PDOException;
 
 class TypeOfLowRepository extends Repository {
-    public function getAll(): array {
+    public function getAll($offset = null, $limit = null): array {
         try {
-            $stmt = $this->connection->prepare("SELECT id, description FROM typeOfLaw");
+            $query = "SELECT id, description FROM typeOfLaw";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
 
             $typesOfLaw = [];

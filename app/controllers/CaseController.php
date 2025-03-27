@@ -26,9 +26,19 @@ class CaseController extends Controller {
     }
 
     public function getAll(): void {
+        $offset = null;
+        $limit = null;
+
+        if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
+            $offset = $_GET["offset"];
+        }
+        if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
+            $limit = $_GET["limit"];
+        }
+
         $cases = [];
         try {
-            $cases = $this->caseService->getAll();
+            $cases = $this->caseService->getAll($offset, $limit);
         } catch (Exception $exception) {
             $this->respondWithError(500, "Cases not found " . $exception->getMessage());
         }

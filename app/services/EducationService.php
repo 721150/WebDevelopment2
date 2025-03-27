@@ -10,8 +10,8 @@ class EducationService {
         $this->educationRepository = new EducationRepository();
     }
 
-    public function getAll(): array {
-        return $this->educationRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->educationRepository->getAll($offset, $limit);
     }
 }
 ?>

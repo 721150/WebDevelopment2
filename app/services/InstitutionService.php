@@ -10,8 +10,8 @@ class InstitutionService {
         $this->institutionRepository = new InstitutionRepository();
     }
 
-    public function getAll(): array {
-        return $this->institutionRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->institutionRepository->getAll($offset, $limit);
     }
 }
 ?>

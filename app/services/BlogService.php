@@ -15,8 +15,8 @@ class BlogService {
     /**
      * @throws Exception
      */
-    public function getAll(): array {
-        return $this->blogRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->blogRepository->getAll($offset, $limit);
     }
 
     /**

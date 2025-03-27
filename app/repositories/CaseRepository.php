@@ -14,11 +14,21 @@ use App\Models\TypeOfLaw;
 use PDOException;
 
 class CaseRepository extends Repository {
-    public function getAll() {
+    public function getAll($offset = null, $limit = null): array {
         $cases = [];
 
         try {
-            $stmt = $this->connection->prepare("SELECT c.id, u.id AS userId, u.firstname, u.lastname, u.email, u.institutionId, u.image, u.phone, a.id AS applicantId, a.educationId, s.id AS subjectId, s.description AS subject, t.id AS typeOfLawId, t.description AS typeOfLaw, c.content, st.description AS status, i.name AS institution, e.name AS education, d.document FROM `case` c JOIN `user` u ON c.userId = u.id JOIN `applicant` a ON u.id = a.userId JOIN `subject` s ON c.subjectId = s.id JOIN `typeOfLaw` t ON c.typeOfLawId = t.id JOIN `status` st ON c.statusId = st.id JOIN `institution` i ON c.institutionId = i.id JOIN `education` e ON c.educationId = e.id LEFT JOIN `document` d ON c.id = d.caseId");
+            $query = "SELECT c.id, u.id AS userId, u.firstname, u.lastname, u.email, u.institutionId, u.image, u.phone, a.id AS applicantId, a.educationId, s.id AS subjectId, s.description AS subject, t.id AS typeOfLawId, t.description AS typeOfLaw, c.content, st.description AS status, i.name AS institution, e.name AS education, d.document FROM `case` c JOIN `user` u ON c.userId = u.id JOIN `applicant` a ON u.id = a.userId JOIN `subject` s ON c.subjectId = s.id JOIN `typeOfLaw` t ON c.typeOfLawId = t.id JOIN `status` st ON c.statusId = st.id JOIN `institution` i ON c.institutionId = i.id JOIN `education` e ON c.educationId = e.id LEFT JOIN `document` d ON c.id = d.caseId";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

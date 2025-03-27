@@ -10,8 +10,8 @@ class TypeOfLawService {
         $this->typeOfLowRepository = new TypeOfLowRepository();
     }
 
-    public function getAll(): array {
-        return $this->typeOfLowRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->typeOfLowRepository->getAll($offset, $limit);
     }
 }
 ?>

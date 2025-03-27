@@ -14,11 +14,21 @@ use PDOException;
 
 class UserRepository extends Repository {
 
-    public function getAll(): array {
+    public function getAll($offset = null, $limit = null): array {
         $users = [];
 
         try {
-            $stmt = $this->connection->prepare("SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.image, u.phone, i.id AS institutionId, i.name AS institutionName FROM `user` u JOIN `institution` i ON u.institutionId = i.id");
+            $query = "SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.image, u.phone, i.id AS institutionId, i.name AS institutionName FROM `user` u JOIN `institution` i ON u.institutionId = i.id";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
             $userRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

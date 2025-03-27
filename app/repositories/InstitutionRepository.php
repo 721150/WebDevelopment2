@@ -6,9 +6,19 @@ use PDO;
 use PDOException;
 
 class InstitutionRepository extends Repository {
-    public function getAll(): array {
+    public function getAll($offset = null, $limit = null): array {
         try {
-            $stmt = $this->connection->prepare("SELECT id, name FROM institution");
+            $query = "SELECT id, name FROM institution";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
 
             $institutions = [];

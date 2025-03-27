@@ -11,8 +11,8 @@ class CaseService {
         $this->caseRepository = new CaseRepository();
     }
 
-    public function getAll() {
-        return $this->caseRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->caseRepository->getAll($offset, $limit);
     }
 
     public function getOne(int $id): ?CaseModel {

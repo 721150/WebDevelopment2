@@ -10,8 +10,8 @@ class SubjectService {
         $this->subjectRepository = new SubjectRepository();
     }
 
-    public function getAll(): array {
-        return $this->subjectRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->subjectRepository->getAll($offset, $limit);
     }
 }
 ?>

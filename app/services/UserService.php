@@ -13,8 +13,8 @@ class UserService {
         $this->userRepository = new UserRepository();
     }
 
-    public function getAll(): array {
-        return $this->userRepository->getAll();
+    public function getAll($offset = null, $limit = null): array {
+        return $this->userRepository->getAll($offset, $limit);
     }
 
     public function getOne($id): User|Applicant|Handler|null {

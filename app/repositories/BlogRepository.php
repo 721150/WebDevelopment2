@@ -13,9 +13,19 @@ use PDOException;
 
 class BlogRepository extends Repository {
 
-    public function getAll(): array {
+    public function getAll($offset = null, $limit = null): array {
         try {
-            $stmt = $this->connection->prepare("SELECT b.id, b.dateTime, b.institutionId, b.educationId, b.subjectId, b.typeOfLawId, b.description, b.content, i.name as institutionName, e.name as educationName, s.description as subjectDescription, t.description as typeOfLawDescription FROM blog b JOIN institution i ON b.institutionId = i.id JOIN education e ON b.educationId = e.id JOIN subject s ON b.subjectId = s.id JOIN typeOfLaw t ON b.typeOfLawId = t.id ORDER BY b.dateTime DESC");
+            $query = "SELECT b.id, b.dateTime, b.institutionId, b.educationId, b.subjectId, b.typeOfLawId, b.description, b.content, i.name as institutionName, e.name as educationName, s.description as subjectDescription, t.description as typeOfLawDescription FROM blog b JOIN institution i ON b.institutionId = i.id JOIN education e ON b.educationId = e.id JOIN subject s ON b.subjectId = s.id JOIN typeOfLaw t ON b.typeOfLawId = t.id ORDER BY b.dateTime DESC";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
 
             $blogs = [];

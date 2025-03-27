@@ -6,9 +6,19 @@ use PDO;
 use PDOException;
 
 class SubjectRepository extends Repository {
-    public function getAll(): array {
+    public function getAll($offset = null, $limit = null): array {
         try {
-            $stmt = $this->connection->prepare("SELECT id, description FROM subject");
+            $query = "SELECT id, description FROM subject";
+
+            if (isset($limit) && isset($offset)) {
+                $query .= " LIMIT :limit OFFSET :offset ";
+            }
+            $stmt = $this->connection->prepare($query);
+            if (isset($limit) && isset($offset)) {
+                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
 
             $subjects = [];

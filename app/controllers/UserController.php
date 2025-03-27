@@ -43,9 +43,19 @@ class UserController extends Controller {
     }
 
     public function getAll(): void {
+        $offset = null;
+        $limit = null;
+
+        if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
+            $offset = $_GET["offset"];
+        }
+        if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
+            $limit = $_GET["limit"];
+        }
+
         $users = null;
         try {
-            $users = $this->userService->getAll();
+            $users = $this->userService->getAll($offset, $limit);
         } catch (Exception $exception) {
             $this->respondWithError(500,"Failed to read users: " . $exception->getMessage());
         }
