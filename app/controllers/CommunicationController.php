@@ -17,6 +17,12 @@ class CommunicationController extends Controller {
     }
 
     public function getOne(int $id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $communication = null;
         try {
             $communication = $this->communicationService->getOne($id);
@@ -28,6 +34,12 @@ class CommunicationController extends Controller {
     }
 
     public function create(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $data = $this->getRequestData();
 
         if (empty($data['handler'] || empty($data['content']) || empty($data['caseId']))) {

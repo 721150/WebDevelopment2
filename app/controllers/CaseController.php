@@ -26,6 +26,12 @@ class CaseController extends Controller {
     }
 
     public function getAll(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $offset = null;
         $limit = null;
 
@@ -52,6 +58,12 @@ class CaseController extends Controller {
     }
 
     public function getOne($id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $case = null;
         try {
             $case = $this->caseService->getOne($id);
@@ -68,6 +80,12 @@ class CaseController extends Controller {
     }
 
     public function getByUser($userId): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         try {
             $cases = $this->caseService->getByUser($userId);
         } catch (Exception $exception) {
@@ -81,6 +99,12 @@ class CaseController extends Controller {
      * @throws RandomException
      */
     public function create(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $requiredFields = ['user', 'subject', 'typeOfLaw', 'content'];
         $data = [];
 
@@ -122,6 +146,12 @@ class CaseController extends Controller {
     }
 
     public function update($id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $data = $this->getRequestData();
 
         $requiredFields = ['user', 'subject', 'typeOfLaw', 'content', 'status'];

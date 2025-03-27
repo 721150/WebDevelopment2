@@ -43,6 +43,12 @@ class UserController extends Controller {
     }
 
     public function getAll(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $offset = null;
         $limit = null;
 
@@ -69,6 +75,12 @@ class UserController extends Controller {
     }
 
     public function getOne($id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         try {
             $user = $this->userService->getOne($id);
         } catch (Exception $exception) {
@@ -85,6 +97,12 @@ class UserController extends Controller {
     }
 
     public function createAdmin(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $data = $this->getRequestData();
         $user = $this->createUser($data, 'admin');
         if ($user === null) return;
@@ -102,6 +120,12 @@ class UserController extends Controller {
     }
 
     public function createHandler(): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $data = $this->getRequestData();
         $user = $this->createUser($data, 'handler');
         if ($user === null) return;
@@ -136,6 +160,12 @@ class UserController extends Controller {
     }
 
     public function update($id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         $data = $this->getRequestData();
 
         $requiredFields = ['id', 'firstname', 'lastname', 'email', 'institution', 'phone'];
@@ -167,6 +197,12 @@ class UserController extends Controller {
     }
 
     public function delete($id): void {
+        $token = $this->checkForJwt();
+        if (!$token) {
+            $this->respondWithError(401, "No token provided");
+            return;
+        }
+
         try {
             $deleted = $this->userService->delete($id);
         } catch (Exception $exception) {
