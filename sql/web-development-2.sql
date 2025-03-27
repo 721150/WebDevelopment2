@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 26 mrt 2025 om 18:43
+-- Gegenereerd op: 27 mrt 2025 om 12:26
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.28
 
@@ -543,7 +543,7 @@ ALTER TABLE `case`
 -- AUTO_INCREMENT voor een tabel `communication`
 --
 ALTER TABLE `communication`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT voor een tabel `document`

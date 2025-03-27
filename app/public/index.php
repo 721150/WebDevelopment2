@@ -52,6 +52,7 @@ $router->post('/reacties', 'ReactieController@create');
 
 // Routes voor antwoorden
 $router->get('/communications/(\d+)', 'CommunicationController@getOne');
+$router->post('/communications', 'CommunicationController@create');
 
 $router->run();
 ?>

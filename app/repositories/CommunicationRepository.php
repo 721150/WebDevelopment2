@@ -35,5 +35,28 @@ class CommunicationRepository extends Repository {
 
         return $communication;
     }
+
+    public function create(Communication $communication, int $caseId) {
+        try {
+            $stmt = $this->connection->prepare("INSERT INTO communication (handler, content, caseId) VALUES (:handler, :content, :caseId)");
+
+            $handler = $communication->getHandler()->getId();
+            $content = $communication->getContent();
+
+            $stmt->bindParam(":handler", $handler);
+            $stmt->bindParam(":content", $content);
+            $stmt->bindParam(":caseId", $caseId);
+
+            $stmt->execute();
+
+            $generatedId = $this->connection->lastInsertId();
+
+            $newCommunication = new Communication($generatedId, $communication->getHandler(), $communication->getContent());
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
+
+        return $newCommunication;
+    }
 }
 ?>

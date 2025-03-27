@@ -4,11 +4,11 @@ namespace App\Models;
 use JsonSerializable;
 
 class Communication implements JsonSerializable {
-    private int $id;
-    private Handler  $handler;
+    private ?int $id;
+    private Handler $handler;
     private string $content;
 
-    public function __construct(int $id, Handler $handler, string $content) {
+    public function __construct(?int $id, Handler $handler, string $content) {
         $this->id = $id;
         $this->handler = $handler;
         $this->content = $content;
