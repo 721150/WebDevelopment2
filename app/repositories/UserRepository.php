@@ -218,27 +218,31 @@ class UserRepository extends Repository {
      */
     private function insertUser(User $user): int
     {
-        $stmt = $this->connection->prepare("INSERT INTO `user` (firstname, lastname, email, password, institutionId, image, phone) VALUES (:firstname, :lastname, :email, :password, :institutionId, :image, :phone)");
+        try {
+            $stmt = $this->connection->prepare("INSERT INTO `user` (firstname, lastname, email, password, institutionId, image, phone) VALUES (:firstname, :lastname, :email, :password, :institutionId, :image, :phone)");
 
-        $firstname = $user->getFirstname();
-        $lastname = $user->getLastname();
-        $email = $user->getEmail();
-        $password = password_hash($user->getPassword(), PASSWORD_DEFAULT);
-        $institutionId = $user->getInstitution()->getId();
-        $image = $user->getImage();
-        $phone = $user->getPhone();
+            $firstname = $user->getFirstname();
+            $lastname = $user->getLastname();
+            $email = $user->getEmail();
+            $password = password_hash($user->getPassword(), PASSWORD_DEFAULT);
+            $institutionId = $user->getInstitution()->getId();
+            $image = $user->getImage();
+            $phone = $user->getPhone();
 
-        $stmt->bindParam(':firstname', $firstname);
-        $stmt->bindParam(':lastname', $lastname);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':password', $password);
-        $stmt->bindParam(':institutionId', $institutionId);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':phone', $phone);
+            $stmt->bindParam(':firstname', $firstname);
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':image', $image);
+            $stmt->bindParam(':phone', $phone);
 
-        $stmt->execute();
+            $stmt->execute();
 
-        return $this->connection->lastInsertId();
+            return $this->connection->lastInsertId();
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     /**
@@ -247,123 +251,151 @@ class UserRepository extends Repository {
      */
     private function insertHandlerDetails(Handler $user, bool|string $handlerId): void
     {
-        foreach ($user->getTypeOfLaws() as $typeOfLaw) {
-            $stmt = $this->connection->prepare("INSERT INTO `handlerTypeOfLow` (handlerId, typeOfLawId) VALUES (:handlerId, :typeOfLawId)");
-            $typeOfLawId = $typeOfLaw->getId();
-            $stmt->bindParam(':handlerId', $handlerId);
-            $stmt->bindParam(':typeOfLawId', $typeOfLawId);
-            $stmt->execute();
-        }
+        try {
+            foreach ($user->getTypeOfLaws() as $typeOfLaw) {
+                $stmt = $this->connection->prepare("INSERT INTO `handlerTypeOfLow` (handlerId, typeOfLawId) VALUES (:handlerId, :typeOfLawId)");
+                $typeOfLawId = $typeOfLaw->getId();
+                $stmt->bindParam(':handlerId', $handlerId);
+                $stmt->bindParam(':typeOfLawId', $typeOfLawId);
+                $stmt->execute();
+            }
 
-        foreach ($user->getSubjects() as $subject) {
-            $stmt = $this->connection->prepare("INSERT INTO `handlerSubject` (handlerId, subjectId) VALUES (:handlerId, :subjectId)");
-            $subjectId = $subject->getId();
-            $stmt->bindParam(':handlerId', $handlerId);
-            $stmt->bindParam(':subjectId', $subjectId);
-            $stmt->execute();
+            foreach ($user->getSubjects() as $subject) {
+                $stmt = $this->connection->prepare("INSERT INTO `handlerSubject` (handlerId, subjectId) VALUES (:handlerId, :subjectId)");
+                $subjectId = $subject->getId();
+                $stmt->bindParam(':handlerId', $handlerId);
+                $stmt->bindParam(':subjectId', $subjectId);
+                $stmt->execute();
+            }
+        } catch (PDOException $exception) {
+            throw $exception;
         }
     }
 
     private function fetchHandlerDetails(int $handlerId): array {
-        $stmt = $this->connection->prepare("SELECT t.id as typeOfLaw_id, t.description as typeOfLaw_description FROM `handlerTypeOfLow` htl JOIN `typeOfLaw` t ON htl.typeOfLawId = t.id WHERE htl.handlerId = :handlerId");
-        $stmt->bindParam(':handlerId', $handlerId);
-        $stmt->execute();
-        $typeOfLaws = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->connection->prepare("SELECT t.id as typeOfLaw_id, t.description as typeOfLaw_description FROM `handlerTypeOfLow` htl JOIN `typeOfLaw` t ON htl.typeOfLawId = t.id WHERE htl.handlerId = :handlerId");
+            $stmt->bindParam(':handlerId', $handlerId);
+            $stmt->execute();
+            $typeOfLaws = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmt = $this->connection->prepare("SELECT s.id as subject_id, s.description as subject_description FROM `handlerSubject` hs JOIN `subject` s ON hs.subjectId = s.id WHERE hs.handlerId = :handlerId");
-        $stmt->bindParam(':handlerId', $handlerId);
-        $stmt->execute();
-        $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->connection->prepare("SELECT s.id as subject_id, s.description as subject_description FROM `handlerSubject` hs JOIN `subject` s ON hs.subjectId = s.id WHERE hs.handlerId = :handlerId");
+            $stmt->bindParam(':handlerId', $handlerId);
+            $stmt->execute();
+            $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return ['typeOfLaws' => $typeOfLaws, 'subjects' => $subjects];
+            return ['typeOfLaws' => $typeOfLaws, 'subjects' => $subjects];
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     private function fetchApplicantDetails(int $applicantId): array {
-        $stmt = $this->connection->prepare("SELECT e.id as education_id, e.name as education_name FROM `applicant` a JOIN `education` e ON a.educationId = e.id WHERE a.id = :applicantId");
-        $stmt->bindParam(':applicantId', $applicantId);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->connection->prepare("SELECT e.id as education_id, e.name as education_name FROM `applicant` a JOIN `education` e ON a.educationId = e.id WHERE a.id = :applicantId");
+            $stmt->bindParam(':applicantId', $applicantId);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     private function updateUserDetails($user): void {
-        $stmt = $this->connection->prepare("UPDATE `user` SET firstname = :firstname, lastname = :lastname, email = :email, institutionId = :institutionId, image = :image, phone = :phone WHERE id = :id");
+        try {
+            $stmt = $this->connection->prepare("UPDATE `user` SET firstname = :firstname, lastname = :lastname, email = :email, institutionId = :institutionId, image = :image, phone = :phone WHERE id = :id");
 
-        $firstname = $user->getFirstname();
-        $lastname = $user->getLastname();
-        $email = $user->getEmail();
-        $institutionId = $user->getInstitution()->getId();
-        $image = $user->getImage();
-        $phone = $user->getPhone();
-        $id = $user->getId();
+            $firstname = $user->getFirstname();
+            $lastname = $user->getLastname();
+            $email = $user->getEmail();
+            $institutionId = $user->getInstitution()->getId();
+            $image = $user->getImage();
+            $phone = $user->getPhone();
+            $id = $user->getId();
 
-        $stmt->bindParam(':firstname', $firstname);
-        $stmt->bindParam(':lastname', $lastname);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':institutionId', $institutionId);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':firstname', $firstname);
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':institutionId', $institutionId);
+            $stmt->bindParam(':image', $image);
+            $stmt->bindParam(':phone', $phone);
+            $stmt->bindParam(':id', $id);
 
-        $stmt->execute();
+            $stmt->execute();
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     private function deleteHandlerDetails(int $handlerId): void {
-        $stmt = $this->connection->prepare("DELETE FROM `handlerTypeOfLow` WHERE handlerId = :handlerId");
-        $stmt->bindParam(':handlerId', $handlerId);
-        $stmt->execute();
+        try {
+            $stmt = $this->connection->prepare("DELETE FROM `handlerTypeOfLow` WHERE handlerId = :handlerId");
+            $stmt->bindParam(':handlerId', $handlerId);
+            $stmt->execute();
 
-        $stmt = $this->connection->prepare("DELETE FROM `handlerSubject` WHERE handlerId = :handlerId");
-        $stmt->bindParam(':handlerId', $handlerId);
-        $stmt->execute();
+            $stmt = $this->connection->prepare("DELETE FROM `handlerSubject` WHERE handlerId = :handlerId");
+            $stmt->bindParam(':handlerId', $handlerId);
+            $stmt->execute();
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     private function fetchUserByRole(string $username, string $role): ?array {
-        $query = match ($role) {
-            'applicant' => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName, education.id AS educationId, education.name AS educationName, applicant.id AS applicantId FROM `applicant` JOIN `user` ON user.id = applicant.userId JOIN `institution` ON user.institutionId = institution.id JOIN `education` ON applicant.educationId = education.id WHERE email = :email",
-            'handler' => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName, handler.id AS handlerId, GROUP_CONCAT(DISTINCT CONCAT(typeOfLaw.id, ':', typeOfLaw.description)) AS typeOfLaws, GROUP_CONCAT(DISTINCT CONCAT(subject.id, ':', subject.description)) AS subjects FROM `handler` JOIN `user` ON user.id = handler.userId JOIN `institution` ON user.institutionId = institution.id LEFT JOIN `handlerTypeOfLow` ON handler.id = handlerTypeOfLow.handlerId LEFT JOIN `typeOfLaw` ON handlerTypeOfLow.typeOfLawId = typeOfLaw.id LEFT JOIN `handlerSubject` ON handler.id = handlerSubject.handlerId LEFT JOIN `subject` ON handlerSubject.subjectId = subject.id WHERE email = :email GROUP BY user.id",
-            default => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName FROM `user` JOIN `institution` ON user.institutionId = institution.id WHERE email = :email AND user.id NOT IN (SELECT userId FROM `handler` UNION SELECT userId FROM `applicant`)"
-        };
+        try {
+            $query = match ($role) {
+                'applicant' => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName, education.id AS educationId, education.name AS educationName, applicant.id AS applicantId FROM `applicant` JOIN `user` ON user.id = applicant.userId JOIN `institution` ON user.institutionId = institution.id JOIN `education` ON applicant.educationId = education.id WHERE email = :email",
+                'handler' => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName, handler.id AS handlerId, GROUP_CONCAT(DISTINCT CONCAT(typeOfLaw.id, ':', typeOfLaw.description)) AS typeOfLaws, GROUP_CONCAT(DISTINCT CONCAT(subject.id, ':', subject.description)) AS subjects FROM `handler` JOIN `user` ON user.id = handler.userId JOIN `institution` ON user.institutionId = institution.id LEFT JOIN `handlerTypeOfLow` ON handler.id = handlerTypeOfLow.handlerId LEFT JOIN `typeOfLaw` ON handlerTypeOfLow.typeOfLawId = typeOfLaw.id LEFT JOIN `handlerSubject` ON handler.id = handlerSubject.handlerId LEFT JOIN `subject` ON handlerSubject.subjectId = subject.id WHERE email = :email GROUP BY user.id",
+                default => "SELECT user.id, firstname, lastname, email, password, image, phone, institution.id AS institutionId, institution.name AS institutionName FROM `user` JOIN `institution` ON user.institutionId = institution.id WHERE email = :email AND user.id NOT IN (SELECT userId FROM `handler` UNION SELECT userId FROM `applicant`)"
+            };
 
-        $stmt = $this->connection->prepare($query);
-        $stmt->execute([':email' => $username]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute([':email' => $username]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result !== false ? $result : null;
+            return $result !== false ? $result : null;
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 
     private function fetchUserDetails(array $row): User|Applicant|Handler {
-        $institution = new Institution($row['institutionId'], $row['institutionName']);
-        $image = $row['image'] ?? null;
+        try {
+            $institution = new Institution($row['institutionId'], $row['institutionName']);
+            $image = $row['image'] ?? null;
 
-        $stmt = $this->connection->prepare("SELECT a.id AS applicantId, e.id AS educationId, e.name AS educationName FROM `applicant` a JOIN `education` e ON a.educationId = e.id WHERE a.userId = :userId");
-        $stmt->bindParam(':userId', $row['id']);
-        $stmt->execute();
-        $applicantRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->connection->prepare("SELECT a.id AS applicantId, e.id AS educationId, e.name AS educationName FROM `applicant` a JOIN `education` e ON a.educationId = e.id WHERE a.userId = :userId");
+            $stmt->bindParam(':userId', $row['id']);
+            $stmt->execute();
+            $applicantRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($applicantRow) {
-            $education = new Education($applicantRow['educationId'], $applicantRow['educationName']);
-            return new Applicant($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $applicantRow['applicantId'], $education);
-        }
-
-        $stmt = $this->connection->prepare("SELECT h.id AS handlerId, GROUP_CONCAT(DISTINCT CONCAT(t.id, ':', t.description)) AS typeOfLaws, GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.description)) AS subjects FROM `handler` h LEFT JOIN `handlerTypeOfLow` htl ON h.id = htl.handlerId LEFT JOIN `typeOfLaw` t ON htl.typeOfLawId = t.id LEFT JOIN `handlerSubject` hs ON h.id = hs.handlerId LEFT JOIN `subject` s ON hs.subjectId = s.id WHERE h.userId = :userId GROUP BY h.id");
-        $stmt->bindParam(':userId', $row['id']);
-        $stmt->execute();
-        $handlerRow = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($handlerRow) {
-            $typeOfLaws = [];
-            foreach (explode(',', $handlerRow['typeOfLaws']) as $typeOfLaw) {
-                list($id, $description) = explode(':', $typeOfLaw);
-                $typeOfLaws[] = new TypeOfLaw($id, TypeOfLow::fromDatabase($description));
+            if ($applicantRow) {
+                $education = new Education($applicantRow['educationId'], $applicantRow['educationName']);
+                return new Applicant($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $applicantRow['applicantId'], $education);
             }
-            $subjects = [];
-            foreach (explode(',', $handlerRow['subjects']) as $subject) {
-                list($id, $description) = explode(':', $subject);
-                $subjects[] = new Subject($id, $description);
-            }
-            return new Handler($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $handlerRow['handlerId'], $typeOfLaws, $subjects);
-        }
 
-        return new User($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone']);
+            $stmt = $this->connection->prepare("SELECT h.id AS handlerId, GROUP_CONCAT(DISTINCT CONCAT(t.id, ':', t.description)) AS typeOfLaws, GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.description)) AS subjects FROM `handler` h LEFT JOIN `handlerTypeOfLow` htl ON h.id = htl.handlerId LEFT JOIN `typeOfLaw` t ON htl.typeOfLawId = t.id LEFT JOIN `handlerSubject` hs ON h.id = hs.handlerId LEFT JOIN `subject` s ON hs.subjectId = s.id WHERE h.userId = :userId GROUP BY h.id");
+            $stmt->bindParam(':userId', $row['id']);
+            $stmt->execute();
+            $handlerRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($handlerRow) {
+                $typeOfLaws = [];
+                foreach (explode(',', $handlerRow['typeOfLaws']) as $typeOfLaw) {
+                    list($id, $description) = explode(':', $typeOfLaw);
+                    $typeOfLaws[] = new TypeOfLaw($id, TypeOfLow::fromDatabase($description));
+                }
+                $subjects = [];
+                foreach (explode(',', $handlerRow['subjects']) as $subject) {
+                    list($id, $description) = explode(':', $subject);
+                    $subjects[] = new Subject($id, $description);
+                }
+                return new Handler($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone'], $handlerRow['handlerId'], $typeOfLaws, $subjects);
+            }
+
+            return new User($row['id'], $row['firstname'], $row['lastname'], $row['email'], null, $institution, $image, $row['phone']);
+        } catch (PDOException $exception) {
+            throw $exception;
+        }
     }
 }
