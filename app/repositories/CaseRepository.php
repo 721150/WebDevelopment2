@@ -87,6 +87,7 @@ class CaseRepository extends Repository {
                 $newCase = new CaseModel($caseId, $case->getUser(), $case->getSubject(), $case->getTypeOfLaw(), $case->getContent(), $case->getStatus(), $case->getInstitution(), $case->getEducation(), $documents);
             });
         } catch (PDOException $exception) {
+            error_log($exception->getMessage());
             throw $exception;
         }
 
@@ -168,7 +169,7 @@ class CaseRepository extends Repository {
      */
     public function takeData(CaseModel $case): array
     {
-        $userId = $case->getUser()->getUserId();
+        $userId = $case->getUser()->getId();
         $subjectId = $case->getSubject()->getId();
         $typeOfLawId = $case->getTypeOfLaw()->getId();
         $content = $case->getContent();

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Gegenereerd op: 27 mrt 2025 om 12:26
+-- Gegenereerd op: 27 mrt 2025 om 13:11
 -- Serverversie: 11.7.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.28
 
@@ -68,7 +68,9 @@ INSERT INTO `blog` (`id`, `dateTime`, `institutionId`, `educationId`, `subjectId
 (3, '2025-03-10 14:07:02', 5, 5, 1, 1, 'Toelating', 'Wat kan ok doen als ik het niet eens ben met een afwijzing voor de opleiding, omdat ik geen wiskunde heb gevolgd?'),
 (4, '2025-03-10 08:44:45', 5, 5, 1, 1, 'Uitschrijving', 'De opleiding heeft me zomaar uitgeschreven. Wat kan ik doen?'),
 (6, '2025-03-14 08:29:24', 5, 5, 1, 1, 'Toelating', 'Ik met het niet eens met de toelatingsvoorwaarden. Wat kan ik doen?'),
-(23, '2025-03-17 11:44:28', 5, 5, 1, 1, 'Toelating', 'Ik met het niet eens met de toelatingsvoorwaarden. Wat kan ik doen?');
+(23, '2025-03-17 11:44:28', 5, 5, 1, 1, 'Toelating', 'Ik met het niet eens met de toelatingsvoorwaarden. Wat kan ik doen?'),
+(29, '2025-03-27 12:36:13', 1, 13, 9, 1, 'Test', 'Test'),
+(30, '2025-03-27 12:37:24', 2, 14, 9, 2, 'test2', 'test2');
 
 -- --------------------------------------------------------
 
@@ -92,7 +94,7 @@ CREATE TABLE `case` (
 --
 
 INSERT INTO `case` (`id`, `userId`, `subjectId`, `typeOfLawId`, `content`, `statusId`, `institutionId`, `educationId`) VALUES
-(1, 1, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen?', 1, 1, 16),
+(1, 1, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen?', 2, 1, 16),
 (2, 2, 6, 3, 'Wat kan ik doen als iemand verveld tegen met doet?', 3, 16, 4),
 (3, 3, 2, 2, 'Wat kan ik doen als ik het niet eens ben met een beoordeling van een examen? Weet niet wat ik er mee moet. Wat te doen:((', 1, 1, 16),
 (64, 1, 3, 3, 'Wat kan ik doen als ik niet op stage mag ondanks dat ik aan alle voorwaarden voldoe?', 1, 1, 16),
@@ -117,7 +119,8 @@ CREATE TABLE `communication` (
 --
 
 INSERT INTO `communication` (`id`, `handler`, `content`, `caseId`) VALUES
-(1, 4, 'Dat kan bij de examencommissie.', 66);
+(1, 4, 'Dat kan bij de examencommissie.', 66),
+(7, 4, 'Dan kun je in beroep gaan tegen het cijfer.', 1);
 
 -- --------------------------------------------------------
 
@@ -217,11 +220,11 @@ CREATE TABLE `handlerSubject` (
 --
 
 INSERT INTO `handlerSubject` (`id`, `handlerId`, `subjectId`) VALUES
-(32, 1, 9),
-(33, 1, 11),
-(34, 1, 1),
-(35, 1, 2),
-(36, 1, 10);
+(37, 1, 9),
+(38, 1, 11),
+(39, 1, 1),
+(40, 1, 2),
+(41, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -240,8 +243,9 @@ CREATE TABLE `handlerTypeOfLow` (
 --
 
 INSERT INTO `handlerTypeOfLow` (`id`, `handlerId`, `typeOfLawId`) VALUES
-(27, 1, 2),
-(28, 1, 1);
+(29, 1, 2),
+(30, 1, 1),
+(31, 1, 3);
 
 -- --------------------------------------------------------
 
@@ -300,7 +304,9 @@ CREATE TABLE `reactie` (
 INSERT INTO `reactie` (`id`, `blogId`, `dateTime`, `content`) VALUES
 (1, 1, '2025-03-09 14:08:20', 'Dat wordt automatisch voor je gedaan.'),
 (2, 1, '2025-03-09 14:08:20', 'Vraag het na bij de csa.'),
-(6, 1, '2025-03-10 10:04:22', 'Vraag het na bij je teamleider na.');
+(6, 1, '2025-03-10 10:04:22', 'Vraag het na bij je teamleider na.'),
+(30, 29, '2025-03-27 12:36:19', 'Test'),
+(31, 29, '2025-03-27 12:37:09', 'test');
 
 -- --------------------------------------------------------
 
@@ -525,31 +531,31 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT voor een tabel `applicant`
 --
 ALTER TABLE `applicant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT voor een tabel `blog`
 --
 ALTER TABLE `blog`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT voor een tabel `case`
 --
 ALTER TABLE `case`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT voor een tabel `communication`
 --
 ALTER TABLE `communication`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT voor een tabel `document`
 --
 ALTER TABLE `document`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT voor een tabel `education`
@@ -561,19 +567,19 @@ ALTER TABLE `education`
 -- AUTO_INCREMENT voor een tabel `handler`
 --
 ALTER TABLE `handler`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT voor een tabel `handlerSubject`
 --
 ALTER TABLE `handlerSubject`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT voor een tabel `handlerTypeOfLow`
 --
 ALTER TABLE `handlerTypeOfLow`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT voor een tabel `institution`
@@ -585,7 +591,7 @@ ALTER TABLE `institution`
 -- AUTO_INCREMENT voor een tabel `reactie`
 --
 ALTER TABLE `reactie`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT voor een tabel `status`
@@ -609,7 +615,7 @@ ALTER TABLE `typeOfLaw`
 -- AUTO_INCREMENT voor een tabel `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- Beperkingen voor geëxporteerde tabellen
